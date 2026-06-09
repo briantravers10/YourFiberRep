@@ -1111,6 +1111,7 @@ function renderDashBars() {
 
 // ── CALENDAR ──
 function renderCal(gridId, labelId) {
+  const filter = document.getElementById('calFilter') ? document.getElementById('calFilter').value : 'all';
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById(labelId).textContent = months[calMonth] + ' ' + calYear;
   const grid = document.getElementById(gridId);
@@ -1123,10 +1124,10 @@ function renderCal(gridId, labelId) {
   for (let d = 1; d <= total; d++) {
     const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-    const hasBooking = leads.some(l => l.slot && l.slot.startsWith(dateStr));
-    const hasFollowUp = leads.some(l => l.followUpDate === dateStr);
-    const hasInstall = leads.some(l => l.installDate === dateStr);
-    const isBlocked = blocks.some(b => b.date === dateStr);
+    const hasBooking = (filter === 'all' || filter === 'calls') && leads.some(l => l.slot && l.slot.startsWith(dateStr));
+    const hasFollowUp = (filter === 'all' || filter === 'followups') && leads.some(l => l.followUpDate === dateStr);
+    const hasInstall = (filter === 'all' || filter === 'installs') && leads.some(l => l.installDate === dateStr);
+    const isBlocked = filter === 'all' && blocks.some(b => b.date === dateStr);
     let cls = 'cal-day';
     if (isToday) cls += ' today';
     else if (isBlocked) cls += ' blocked';
@@ -1141,6 +1142,7 @@ function renderCal(gridId, labelId) {
   }
   grid.innerHTML = html;
 }
+
 
 function changeMonth(dir) {
   calMonth += dir;
@@ -1158,6 +1160,8 @@ function selectCalDay(dateStr) {
 }
 
 function applyCalFilter() {
+  renderCal('calGrid', 'calMonthLabel');
+  renderCal('calGrid2', 'calMonthLabel2');
   if (window._currentCalDate) renderSelectedDay(window._currentCalDate);
 }
 
