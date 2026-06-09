@@ -1149,24 +1149,24 @@ function selectCalDay(dateStr) {
     html = '<div class="empty-state"><p>Nothing scheduled.</p></div>';
   }
   dayLeads.forEach(l => {
-    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;" onclick="openLeadFromCal('${l.id}')">
-      <div class="booking-time">${l.slot.split(' at ')[1] || '—'}</div>
-      <div style="flex:1;">
+    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;user-select:none;" onclick="event.stopPropagation();openLeadFromCal('${l.id}')">
+      <div class="booking-time" style="pointer-events:none;">${l.slot.split(' at ')[1] || '—'}</div>
+      <div style="flex:1;pointer-events:none;">
         <div class="booking-name">${l.name}</div>
         <div class="booking-plan">${l.phone || '—'}</div>
       </div>
-      <div class="booking-source source-${l.source}">${l.source}</div>
-      <span style="font-size:0.75rem;color:var(--muted);margin-left:0.3rem;">→</span>
+      <div class="booking-source source-${l.source}" style="pointer-events:none;">${l.source}</div>
+      <span style="font-size:0.75rem;color:var(--muted);margin-left:0.3rem;pointer-events:none;">→</span>
     </div>`;
   });
   followUps.forEach(l => {
-    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border-color:#b0c4f0;" onclick="openLeadFromCal('${l.id}')">
-      <div class="booking-time" style="background:#4a6fa5;color:#fff;">FOLLOW UP</div>
-      <div style="flex:1;">
+    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border-color:#b0c4f0;user-select:none;" onclick="event.stopPropagation();openLeadFromCal('${l.id}')">
+      <div class="booking-time" style="background:#4a6fa5;color:#fff;pointer-events:none;">FOLLOW UP</div>
+      <div style="flex:1;pointer-events:none;">
         <div class="booking-name">${l.name}</div>
         <div class="booking-plan">${l.phone || '—'}</div>
       </div>
-      <span style="font-size:0.75rem;color:var(--muted);">→</span>
+      <span style="font-size:0.75rem;color:var(--muted);pointer-events:none;">→</span>
     </div>`;
   });
   isBlocked.forEach(b => {
