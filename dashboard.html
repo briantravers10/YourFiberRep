@@ -178,6 +178,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 .cal-day.today { background: var(--accent); color: var(--white); }
 .cal-day.has-booking { background: var(--warm-light); border: 1.5px solid var(--warm); color: var(--text); }
   .has-followup { background: #eef3ff; border: 1.5px solid #4a6fa5; color: #4a6fa5; font-weight: 700; }
+  .has-install { background: #e8f5e9; border: 1.5px solid #4caf50; color: #2e7d32; font-weight: 700; }
   .cal-lead-card { transition: box-shadow 0.15s, transform 0.15s; }
   .cal-lead-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-1px); }
 .cal-day.blocked { background: var(--red-light); border: 1.5px solid #f0b0b0; color: var(--muted); }
@@ -651,7 +652,15 @@ tr:hover td { background: var(--bg); }
           <div class="cal-grid" id="calGrid2"></div>
         </div>
         <div class="card">
-          <div class="card-title">Selected Day — <span id="selectedDayLabel">Select a day</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
+            <div class="card-title" style="margin:0;">Selected Day — <span id="selectedDayLabel">Select a day</span></div>
+            <select id="calFilter" class="form-input" style="width:auto;padding:0.4rem 0.8rem;font-size:0.8rem;font-weight:700;" onchange="applyCalFilter()">
+              <option value="all">📋 All</option>
+              <option value="calls">📞 Booked Calls</option>
+              <option value="followups">🔵 Follow-Ups</option>
+              <option value="installs">📦 Install Dates</option>
+            </select>
+          </div>
           <div id="selectedDayContent"><div class="empty-state"><p>Click a day to see bookings.</p></div></div>
           <hr class="divider">
           <div class="card-title" style="margin-top:0.5rem;">Block Time Off</div>
@@ -1116,15 +1125,18 @@ function renderCal(gridId, labelId) {
     const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
     const hasBooking = leads.some(l => l.slot && l.slot.startsWith(dateStr));
     const hasFollowUp = leads.some(l => l.followUpDate === dateStr);
+    const hasInstall = leads.some(l => l.installDate === dateStr);
     const isBlocked = blocks.some(b => b.date === dateStr);
     let cls = 'cal-day';
     if (isToday) cls += ' today';
     else if (isBlocked) cls += ' blocked';
     else if (hasBooking) cls += ' has-booking';
     else if (hasFollowUp) cls += ' has-followup';
+    else if (hasInstall) cls += ' has-install';
     let dots = '';
     if (hasBooking && !isToday) dots += '<div class="cal-dot"></div>';
     if (hasFollowUp && !isToday) dots += '<div class="cal-dot" style="background:#4a6fa5;"></div>';
+    if (hasInstall && !isToday) dots += '<div class="cal-dot" style="background:#4caf50;"></div>';
     html += `<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${dots}</div>`;
   }
   grid.innerHTML = html;
@@ -1140,303 +1152,149 @@ function changeMonth(dir) {
 }
 
 function selectCalDay(dateStr) {
+  window._currentCalDate = dateStr;
   document.getElementById('selectedDayLabel').textContent = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-  const dayLeads = leads.filter(l => l.slot && l.slot.startsWith(dateStr));
-  const followUps = leads.filter(l => l.followUpDate === dateStr);
-  const isBlocked = blocks.filter(b => b.date === dateStr);
+  renderSelectedDay(dateStr);
+}
+
+function applyCalFilter() {
+  if (window._currentCalDate) renderSelectedDay(window._currentCalDate);
+}
+
+function renderSelectedDay(dateStr) {
+  const filter = document.getElementById('calFilter') ? document.getElementById('calFilter').value : 'all';
+  const allCalls = leads.filter(l => l.slot && l.slot.startsWith(dateStr));
+  const allFollowUps = leads.filter(l => l.followUpDate === dateStr);
+  const allInstalls = leads.filter(l => l.installDate === dateStr);
+  const blocked = blocks.filter(b => b.date === dateStr);
+
+  let dayLeads = [];
+  let followUps = [];
+  let installs = [];
+
+  if (filter === 'all' || filter === 'calls') dayLeads = allCalls;
+  if (filter === 'all' || filter === 'followups') followUps = allFollowUps;
+  if (filter === 'all' || filter === 'installs') installs = allInstalls;
+
   let html = '';
-  if (dayLeads.length === 0 && followUps.length === 0 && isBlocked.length === 0) {
+  if (dayLeads.length === 0 && followUps.length === 0 && installs.length === 0 && blocked.length === 0) {
     html = '<div class="empty-state"><p>Nothing scheduled.</p></div>';
   }
+
   dayLeads.forEach(l => {
-    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;user-select:none;" onclick="event.stopPropagation();openLeadFromCal('${l.id}')">
-      <div class="booking-time" style="pointer-events:none;">${l.slot.split(' at ')[1] || '—'}</div>
-      <div style="flex:1;pointer-events:none;">
+    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;border:1.5px solid var(--warm);" onclick="openLeadById(${l.id})">
+      <div class="booking-time">${l.slot.split(' at ')[1] || '—'}</div>
+      <div style="flex:1;">
         <div class="booking-name">${l.name}</div>
         <div class="booking-plan">${l.phone || '—'}</div>
       </div>
-      <div class="booking-source source-${l.source}" style="pointer-events:none;">${l.source}</div>
-      <span style="font-size:0.75rem;color:var(--muted);margin-left:0.3rem;pointer-events:none;">→</span>
+      <div class="booking-source source-${l.source}">${l.source}</div>
+      <span style="margin-left:0.5rem;color:var(--muted);">›</span>
     </div>`;
   });
+
   followUps.forEach(l => {
-    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border-color:#b0c4f0;user-select:none;" onclick="event.stopPropagation();openLeadFromCal('${l.id}')">
-      <div class="booking-time" style="background:#4a6fa5;color:#fff;pointer-events:none;">FOLLOW UP</div>
-      <div style="flex:1;pointer-events:none;">
+    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border:1.5px solid #4a6fa5;" onclick="openLeadById(${l.id})">
+      <div class="booking-time" style="background:#4a6fa5;color:#fff;">FOLLOW UP</div>
+      <div style="flex:1;">
         <div class="booking-name">${l.name}</div>
         <div class="booking-plan">${l.phone || '—'}</div>
       </div>
-      <span style="font-size:0.75rem;color:var(--muted);pointer-events:none;">→</span>
+      <span style="margin-left:0.5rem;color:#4a6fa5;">›</span>
     </div>`;
   });
-  isBlocked.forEach(b => {
-    html += `<div class="booking-item" style="background:var(--red-light);border-color:#f0b0b0;">
+
+  installs.forEach(l => {
+    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;background:#e8f5e9;border:1.5px solid #4caf50;" onclick="openLeadById(${l.id})">
+      <div class="booking-time" style="background:#4caf50;color:#fff;">INSTALL</div>
+      <div style="flex:1;">
+        <div class="booking-name">${l.name}</div>
+        <div class="booking-plan">${l.plan || '—'}</div>
+      </div>
+      <span style="margin-left:0.5rem;color:#4caf50;">›</span>
+    </div>`;
+  });
+
+  blocked.forEach(b => {
+    html += `<div class="booking-item" style="background:#fff0f0;border:1.5px solid #f0b0b0;margin-bottom:0.5rem;">
       <div class="booking-time" style="background:#fdd;color:var(--red);">BLOCKED</div>
       <div><div class="booking-name">${b.from} — ${b.to}</div><div class="booking-plan">${b.reason || 'No reason given'}</div></div>
       <button class="btn btn-red btn-sm" onclick="removeBlock('${b.id}')">Remove</button>
     </div>`;
   });
+
   document.getElementById('selectedDayContent').innerHTML = html;
 }
 
-function openLeadFromCal(id) {
-  // Match by id regardless of string/number type
-  const lead = leads.find(l => String(l.id) === String(id));
-  if (!lead) return;
-  openLeadModal(lead);
+function openLeadById(id) {
+  var lead = null;
+  for (var i = 0; i < leads.length; i++) {
+    if (leads[i].id == id) { lead = leads[i]; break; }
+  }
+  if (!lead) { alert('Lead not found'); return; }
+  showLeadModal(lead);
 }
 
-function openLeadModal(lead) {
+function showLeadModal(lead) {
+  var modal = document.getElementById('leadModal');
+  if (!modal) { alert('Modal not found'); return; }
   document.getElementById('leadModalTitle').textContent = lead.name || 'Lead Details';
-  const fields = [
-    { label: 'First Name', value: lead.name ? lead.name.split(' ')[0] : '' },
-    { label: 'Last Name', value: lead.name && lead.name.split(' ').length > 1 ? lead.name.split(' ').slice(1).join(' ') : '' },
-    { label: 'Phone', value: lead.phone || '' },
-    { label: 'Email', value: lead.email || '' },
-    { label: 'Address', value: lead.address || '' },
-    { label: 'Plan', value: lead.plan || '' },
-    { label: 'Source', value: lead.source || '' },
-    { label: 'Status', value: statusLabel(lead.status) || '' },
-    { label: 'Call Time', value: lead.slot || '' },
-    { label: 'Install Date', value: lead.installDate || '' },
-    { label: 'Follow-Up Date', value: lead.followUpDate || '' },
-    { label: 'Date Added', value: lead.date || '' },
+  modal.dataset.leadId = lead.id;
+
+  var nameParts = (lead.name || '').split(' ');
+  var firstName = nameParts[0] || '';
+  var lastName = nameParts.slice(1).join(' ') || '';
+
+  var fields = [
+    ['First Name', firstName],
+    ['Last Name', lastName],
+    ['Phone', lead.phone || ''],
+    ['Email', lead.email || ''],
+    ['Address', lead.address || ''],
+    ['Plan', lead.plan || ''],
+    ['Source', lead.source || ''],
+    ['Status', statusLabel(lead.status) || ''],
+    ['Call Time', lead.slot || ''],
+    ['Install Date', lead.installDate || ''],
+    ['Follow-Up Date', lead.followUpDate || ''],
+    ['Date Added', lead.date || ''],
   ];
-  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem;">';
-  fields.forEach(f => {
-    html += `<div style="background:var(--bg);border-radius:10px;padding:0.7rem 0.9rem;">
-      <div style="font-size:0.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">${f.label}</div>
-      <div style="font-size:0.88rem;font-weight:700;color:var(--text);">${f.value || '<span style="color:var(--muted);font-weight:500;">—</span>'}</div>
-    </div>`;
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-bottom:1rem;">';
+  fields.forEach(function(f) {
+    html += '<div style="background:var(--bg);border-radius:10px;padding:0.7rem 0.9rem;">';
+    html += '<div style="font-size:0.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">' + f[0] + '</div>';
+    html += '<div style="font-size:0.88rem;font-weight:700;color:var(--text);">' + (f[1] || '<span style="color:var(--muted);font-weight:400;">—</span>') + '</div>';
+    html += '</div>';
   });
   html += '</div>';
-  html += `<div style="margin-bottom:0.8rem;">
-    <label style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Private Notes</label>
-    <textarea id="leadNoteInput" class="notes-area" style="margin-top:0.4rem;min-height:80px;">${lead.notes || ''}</textarea>
-  </div>`;
-  html += `<div style="margin-bottom:0.5rem;">
-    <label style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Follow-Up Date</label>
-    <input type="date" id="leadFollowUpInput" class="form-input" style="margin-top:0.4rem;" value="${lead.followUpDate || ''}">
-  </div>`;
-  html += `<div style="margin-bottom:0.5rem;">
-    <label style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Update Status</label>
-    <select id="leadStatusInput" class="form-input" style="margin-top:0.4rem;">
-      <option value="new" ${lead.status==='new'?'selected':''}>New</option>
-      <option value="called" ${lead.status==='called'?'selected':''}>Called</option>
-      <option value="followup" ${lead.status==='followup'?'selected':''}>Follow Up</option>
-      <option value="signedup" ${lead.status==='signedup'?'selected':''}>Signed Up</option>
-      <option value="notinterested" ${lead.status==='notinterested'?'selected':''}>Not Interested</option>
-    </select>
-  </div>`;
-  document.getElementById('leadModalContent').innerHTML = html;
-  document.getElementById('leadModal').classList.add('active');
-  // Store lead id for save
-  document.getElementById('leadModal').dataset.leadId = lead.id;
-}
 
-function renderBlockSelects() {
-  const times = [];
-  for (let h = 0; h < 24; h++) {
-    for (let m = 0; m < 60; m += 30) {
-      const h12 = h > 12 ? h-12 : h === 0 ? 12 : h;
-      const ampm = h >= 12 ? 'PM' : 'AM';
-      times.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} (${h12}:${String(m).padStart(2,'0')} ${ampm})`);
-    }
-  }
-  ['blockFrom','blockTo','blockFromModal','blockToModal'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = times.map((t,i) => `<option value="${t.split(' ')[0]}">${t}</option>`).join('');
+  html += '<div style="margin-bottom:0.8rem;">';
+  html += '<label style="font-size:0.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;">Private Notes</label>';
+  html += '<textarea id="leadNoteInput" class="notes-area" style="margin-top:0.4rem;min-height:70px;">' + (lead.notes || '') + '</textarea>';
+  html += '</div>';
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-bottom:0.5rem;">';
+  html += '<div><label style="font-size:0.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;">Follow-Up Date</label>';
+  html += '<input type="date" id="leadFollowUpInput" class="form-input" style="margin-top:0.3rem;" value="' + (lead.followUpDate || '') + '"></div>';
+  html += '<div><label style="font-size:0.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;">Install Date</label>';
+  html += '<input type="date" id="leadInstallInput" class="form-input" style="margin-top:0.3rem;" value="' + (lead.installDate || '') + '"></div>';
+  html += '</div>';
+
+  html += '<div style="margin-bottom:0.5rem;"><label style="font-size:0.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;">Update Status</label>';
+  html += '<select id="leadStatusInput" class="form-input" style="margin-top:0.3rem;">';
+  var statuses = [['new','New'],['called','Called'],['followup','Follow Up'],['signedup','Signed Up'],['notinterested','Not Interested']];
+  statuses.forEach(function(s) {
+    html += '<option value="' + s[0] + '"' + (lead.status === s[0] ? ' selected' : '') + '>' + s[1] + '</option>';
   });
+  html += '</select></div>';
+
+  document.getElementById('leadModalContent').innerHTML = html;
+  modal.classList.add('active');
 }
 
-function addBlock() {
-  const dateStart = document.getElementById('blockDate').value;
-  const dateEnd = document.getElementById('blockDateEnd').value || dateStart;
-  const from = document.getElementById('blockFrom').value;
-  const to = document.getElementById('blockTo').value;
-  const reason = document.getElementById('blockReason').value;
-  if (!dateStart) { alert('Please select a start date.'); return; }
-  // Add a block entry for each day in the range
-  const start = new Date(dateStart + 'T12:00:00');
-  const end = new Date(dateEnd + 'T12:00:00');
-  let d = new Date(start);
-  while (d <= end) {
-    const dateStr = d.toISOString().slice(0,10);
-    blocks.push({ id: Date.now().toString() + Math.random(), date: dateStr, from, to, reason });
-    d.setDate(d.getDate() + 1);
-  }
-  save('blocks', blocks);
-  renderCal('calGrid', 'calMonthLabel');
-  renderCal('calGrid2', 'calMonthLabel2');
-  renderBlockedList();
-  const rangeLabel = dateStart === dateEnd ? dateStart : `${dateStart} to ${dateEnd}`;
-  logActivity(`Time blocked: ${rangeLabel} ${from}–${to}`);
-}
 
-function addBlockFromModal() {
-  const dateStart = document.getElementById('blockDateModal').value;
-  const dateEnd = document.getElementById('blockDateEndModal').value || dateStart;
-  const from = document.getElementById('blockFromModal').value;
-  const to = document.getElementById('blockToModal').value;
-  const reason = document.getElementById('blockReasonModal').value;
-  if (!dateStart) { alert('Please select a start date.'); return; }
-  const start = new Date(dateStart + 'T12:00:00');
-  const end = new Date(dateEnd + 'T12:00:00');
-  let d = new Date(start);
-  while (d <= end) {
-    const dateStr = d.toISOString().slice(0,10);
-    blocks.push({ id: Date.now().toString() + Math.random(), date: dateStr, from, to, reason });
-    d.setDate(d.getDate() + 1);
-  }
-  save('blocks', blocks);
-  closeModal('blockModal');
-  renderCal('calGrid', 'calMonthLabel');
-  const rangeLabel = dateStart === dateEnd ? dateStart : `${dateStart} to ${dateEnd}`;
-  logActivity(`Time blocked: ${rangeLabel} ${from}–${to}`);
-}
 
-function removeBlock(id) {
-  blocks = blocks.filter(b => b.id !== id);
-  save('blocks', blocks);
-  renderCal('calGrid', 'calMonthLabel');
-  renderCal('calGrid2', 'calMonthLabel2');
-  renderBlockedList();
-}
-
-function renderBlockedList() {
-  const el = document.getElementById('blockedList');
-  if (!el) return;
-  if (blocks.length === 0) { el.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);font-weight:600;margin-top:0.5rem;">No blocked times.</div>'; return; }
-  el.innerHTML = blocks.map(b => `
-    <div class="blocked-item">
-      <span>${b.date} | ${b.from} – ${b.to}${b.reason ? ' — ' + b.reason : ''}</span>
-      <button class="btn btn-red btn-sm" onclick="removeBlock('${b.id}')">Remove</button>
-    </div>`).join('');
-}
-
-// ── LEADS ──
-function renderLeads(filter, search) {
-  filter = filter || currentLeadFilter;
-  let filtered = [...leads];
-  if (filter !== 'all') filtered = filtered.filter(l => l.status === filter);
-  if (search) filtered = filtered.filter(l =>
-    l.name.toLowerCase().includes(search) ||
-    (l.phone||'').includes(search) ||
-    (l.email||'').toLowerCase().includes(search) ||
-    (l.address||'').toLowerCase().includes(search)
-  );
-  const tbody = document.getElementById('leadsBody');
-  if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:2rem;">No leads found.</td></tr>'; return; }
-  tbody.innerHTML = filtered.map(l => `
-    <tr>
-      <td><strong>${l.name}</strong></td>
-      <td>${l.phone || '<span class="td-muted">—</span>'}</td>
-      <td>${l.email || '<span class="td-muted">—</span>'}</td>
-      <td style="max-width:160px;font-size:0.78rem;">${l.address || '<span class="td-muted">—</span>'}</td>
-      <td style="max-width:130px;font-size:0.78rem;">${l.plan || '<span class="td-muted">—</span>'}</td>
-      <td style="font-size:0.78rem;">${l.slot || '<span class="td-muted">—</span>'}</td>
-      <td><span class="booking-source source-${l.source}" style="font-size:0.72rem;">${l.source}</span></td>
-      <td><span class="status-badge status-${l.status}">${statusLabel(l.status)}</span></td>
-      <td style="max-width:120px;font-size:0.78rem;">${l.notes || '<span class="td-muted">—</span>'}</td>
-      <td>
-        <div class="lead-actions">
-          <button class="action-btn" onclick="openLeadModal(${l.id})">View</button>
-          <select class="action-btn" style="cursor:pointer;" onchange="updateStatus(${l.id}, this.value)">
-            <option value="">Status</option>
-            <option value="new">New</option>
-            <option value="called">Called</option>
-            <option value="followup">Follow Up</option>
-            <option value="signedup">Signed Up</option>
-            <option value="notinterested">Not Interested</option>
-            <option value="delete" style="color:var(--red);">🗑 Delete Lead</option>
-          </select>
-        </div>
-      </td>
-    </tr>`).join('');
-}
-
-function statusLabel(s) {
-  return { new:'New', called:'Called', followup:'Follow Up', signedup:'Signed Up', notinterested:'Not Interested' }[s] || s;
-}
-
-function filterLeads(filter, btn) {
-  currentLeadFilter = filter;
-  document.querySelectorAll('.table-filters .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderLeads(filter);
-}
-
-function searchLeads(val) { renderLeads(currentLeadFilter, val.toLowerCase()); }
-
-function updateStatus(id, status) {
-  if (!status) return;
-  if (status === 'delete') {
-    if (!confirm('Delete this lead? This cannot be undone.')) return;
-    leads = leads.filter(l => l.id !== id);
-    save('leads', leads);
-    renderLeads();
-    renderDashboard();
-    logActivity('Lead deleted');
-    return;
-  }
-  const lead = leads.find(l => l.id === id);
-  if (lead) {
-    lead.status = status;
-    save('leads', leads);
-    renderLeads();
-    renderDashboard();
-    logActivity(`Lead status updated: ${lead.name} → ${statusLabel(status)}`);
-  }
-}
-
-function openLeadModal(id) {
-  selectedLeadId = id;
-  const l = leads.find(x => x.id === id);
-  if (!l) return;
-  document.getElementById('leadModalTitle').textContent = l.name;
-  document.getElementById('leadModalContent').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem;">
-      ${field('Phone', l.phone)} ${field('Email', l.email)}
-      ${field('Address', l.address)} ${field('Plan', l.plan)}
-      ${field('Call Time', l.slot)} ${field('Source', l.source)}
-      ${field('Status', statusLabel(l.status))} ${field('Booked', l.date)}
-    </div>
-    <div class="form-group">
-      <label class="form-label">Private Notes</label>
-      <textarea class="notes-area" id="modalNotes" placeholder="Add notes about this lead...">${l.notes || ''}</textarea>
-    </div>
-    <div class="form-group" style="margin-top:0.8rem;">
-      <label class="form-label">Follow-up Date</label>
-      <input type="date" class="form-input" id="modalFollowup" value="${l.followup || ''}">
-    </div>`;
-  document.getElementById('leadModal').classList.add('active');
-}
-
-function field(label, val) {
-  return `<div><div style="font-size:0.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">${label}</div><div style="font-size:0.85rem;font-weight:700;">${val || '<span style="color:var(--muted);font-style:italic;">—</span>'}</div></div>`;
-}
-
-function saveLeadNotes() {
-  const modal = document.getElementById('leadModal');
-  const leadId = parseInt(modal.dataset.leadId) || selectedLeadId;
-  const lead = leads.find(l => l.id === leadId);
-  if (lead) {
-    const notesEl = document.getElementById('leadNoteInput');
-    const followUpEl = document.getElementById('leadFollowUpInput');
-    const statusEl = document.getElementById('leadStatusInput');
-    if (notesEl) lead.notes = notesEl.value;
-    if (followUpEl) lead.followUpDate = followUpEl.value;
-    if (statusEl) lead.status = statusEl.value;
-    save('leads', leads);
-    renderLeads();
-    renderCal('calGrid', 'calMonthLabel');
-    closeModal('leadModal');
-    logActivity(`Lead updated: ${lead.name}`);
-    if (lead.followUpDate) {
-      logActivity(`Follow-up set for ${lead.name} on ${lead.followUpDate}`);
-    }
-  }
-}
 
 // ── ANALYTICS ──
 function renderAnalytics() {
