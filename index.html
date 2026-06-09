@@ -1,0 +1,2448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YourFiberRep — Your Local Brightspeed Rep</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sidebar-w: 230px;
+    --bg: #f5f7f2;
+    --bg2: #eaefe4;
+    --white: #ffffff;
+    --surface: #ffffff;
+    --accent: #3a6b4a;
+    --accent-light: #e8f2eb;
+    --accent-dark: #2a5238;
+    --green: #3a6b4a;
+    --green-light: #e8f2eb;
+    --warm: #c9973a;
+    --text: #1e2a1e;
+    --muted: #6b7a6b;
+    --border: #dde5d8;
+    --shadow: 0 4px 24px rgba(0,0,0,0.07);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.10);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 4rem;
+    background: rgba(247,244,239,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800; font-size: 1.25rem;
+    color: var(--accent-dark);
+    letter-spacing: -0.01em;
+  }
+  .nav-logo span { color: var(--warm); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none; color: var(--muted);
+    font-size: 0.92rem; font-weight: 600;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    background: var(--accent); color: #fff;
+    border: none; padding: 0.6rem 1.5rem;
+    border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 0.9rem; cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 9rem 4rem 5rem;
+    background: linear-gradient(160deg, #f5f7f2 50%, #e8f2eb 100%);
+    position: relative; overflow: hidden;
+  }
+  .hero-blob {
+    position: absolute; right: -80px; top: 50%; transform: translateY(-50%);
+    width: 520px; height: 520px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(58,107,74,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-blob2 {
+    position: absolute; left: -60px; bottom: 0;
+    width: 320px; height: 320px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,151,58,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 600px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--accent-light); border: 1px solid rgba(74,144,164,0.25);
+    padding: 0.45rem 1.1rem; border-radius: 50px;
+    font-size: 0.82rem; color: var(--accent-dark); font-weight: 700;
+    margin-bottom: 1.8rem;
+    animation: fadeUp 0.5s ease both;
+  }
+  .hero-badge::before {
+    content: ''; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); flex-shrink: 0;
+  }
+
+  h1 {
+    font-family: 'Lora', serif;
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    font-weight: 500; line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 1.3rem;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+  h1 strong {
+    font-weight: 700; color: var(--accent-dark);
+  }
+  .hero-sub {
+    font-size: 1.05rem; color: var(--muted); line-height: 1.75;
+    max-width: 480px; margin-bottom: 2.2rem;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+  .hero-actions {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    animation: fadeUp 0.5s 0.3s ease both;
+  }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    border: none; padding: 0.85rem 2rem;
+    border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-size: 0.97rem; font-weight: 700; cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74,144,164,0.3); }
+  .btn-ghost {
+    background: transparent; color: var(--accent-dark);
+    border: 2px solid var(--accent); padding: 0.82rem 2rem;
+    border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-size: 0.97rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-ghost:hover { background: var(--accent-light); }
+
+  .hero-stats {
+    display: flex; gap: 2.5rem; margin-top: 3.5rem;
+    animation: fadeUp 0.5s 0.4s ease both;
+  }
+  .stat-num {
+    font-family: 'Nunito', sans-serif; font-size: 1.9rem;
+    font-weight: 800; color: var(--accent-dark);
+  }
+  .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.1rem; font-weight: 600; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(18px) } to { opacity:1; transform:none } }
+
+  /* ── SECTIONS ── */
+  section { padding: 5.5rem 4rem; }
+  .section-label {
+    font-size: 0.75rem; font-weight: 800; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--warm); margin-bottom: 0.8rem;
+  }
+  h2 {
+    font-family: 'Lora', serif; font-size: clamp(1.7rem, 2.8vw, 2.3rem);
+    font-weight: 600; letter-spacing: -0.01em; line-height: 1.25;
+    margin-bottom: 0.9rem; color: var(--text);
+  }
+  .section-sub { color: var(--muted); font-size: 1rem; max-width: 500px; line-height: 1.75; }
+
+  /* ── WHY ME ── */
+  .why { background: var(--white); }
+  .why-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1.4rem; margin-top: 3rem;
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem; margin-top: 1.2rem;
+  }
+  .why-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.75rem 0.9rem;
+    display: flex; align-items: flex-start; gap: 0.6rem;
+    transition: box-shadow 0.2s;
+  }
+  .why-card:hover { box-shadow: var(--shadow); }
+  .why-card { cursor: pointer; }
+  .why-bullets {
+    list-style: none; margin-top: 0.4rem; padding: 0;
+  }
+  .why-bullets li {
+    font-size: 0.74rem; color: var(--muted); padding: 0.18rem 0;
+    font-weight: 600; line-height: 1.4;
+    display: flex; align-items: flex-start; gap: 0.35rem;
+  }
+  .why-bullets li::before { content: "•"; color: var(--accent); font-weight: 800; flex-shrink:0; }
+  .why-arrow { font-size: 0.7rem; color: var(--accent); margin-left: 0.2rem; transition: transform 0.2s; display:inline-block; }
+  .why-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; flex-shrink: 0; margin-top: 0.1rem;
+  }
+  .why-card-text { flex: 1; }
+  .why-card h3 { font-size: 0.82rem; font-weight: 800; margin-bottom: 0.2rem; color: var(--text); line-height: 1.3; }
+  .why-card p { font-size: 0.76rem; color: var(--muted); line-height: 1.45; }
+
+  /* ── PLANS ── */
+  .plans { background: var(--bg); }
+  .plans-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.5rem; margin-top: 3rem;
+  }
+  .plan-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 1.4rem 1.6rem; position: relative;
+    transition: box-shadow 0.3s, transform 0.3s;
+  }
+  .plan-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+  .plan-card.popular {
+    border-color: var(--accent);
+    box-shadow: 0 6px 30px rgba(74,144,164,0.15);
+  }
+  .popular-tag {
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #fff;
+    font-size: 0.7rem; font-weight: 800;
+    padding: 0.3rem 1.1rem; border-radius: 50px; letter-spacing: 0.1em;
+    text-transform: uppercase; white-space: nowrap;
+  }
+  .plan-speed {
+    font-family: 'Nunito', sans-serif; font-size: 2.6rem;
+    font-weight: 800; color: var(--accent-dark); line-height: 1;
+  }
+  .plan-speed span { font-size: 1rem; color: var(--muted); font-weight: 600; }
+  .plan-name { font-size: 1.05rem; font-weight: 800; margin: 0.5rem 0 0.2rem; color: var(--text); }
+  .plan-price { font-size: 1.9rem; font-weight: 800; margin: 1rem 0 0.2rem; color: var(--text); }
+  .plan-price span { font-size: 0.88rem; color: var(--muted); font-weight: 600; }
+  .plan-features { list-style: none; margin: 1.2rem 0 1.8rem; }
+  .plan-features li {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.82rem; color: var(--muted); padding: 0.18rem 0; font-weight: 600;
+  }
+  .plan-features li::before { content: '✓'; color: var(--green); font-weight: 800; font-size: 0.9rem; }
+  .plan-btn {
+    width: 100%; padding: 0.82rem;
+    border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; border: none;
+  }
+  .plan-btn-outline {
+    background: transparent; color: var(--accent);
+    border: 2px solid var(--accent);
+  }
+  .plan-btn-outline:hover { background: var(--accent-light); }
+  .plan-btn-filled { background: var(--accent); color: #fff; }
+  .plan-btn-filled:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+  /* ── ADDRESS CHECKER ── */
+  .checker { background: var(--white); }
+  .checker-inner {
+    max-width: 580px; margin: 2.5rem auto 0;
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 2.2rem;
+  }
+  .checker-inner h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.4rem; }
+  .checker-inner p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.6rem; font-weight: 500; }
+  .input-row { display: flex; gap: 0.8rem; }
+  .input-field {
+    flex: 1; background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 50px; padding: 0.8rem 1.3rem;
+    color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 600;
+    outline: none; transition: border-color 0.2s;
+  }
+  .input-field:focus { border-color: var(--accent); }
+  .input-field::placeholder { color: #bbb; font-weight: 500; }
+  .check-btn {
+    background: var(--accent); color: #fff; border: none; padding: 0 1.5rem;
+    border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-size: 0.92rem; font-weight: 700; cursor: pointer;
+    transition: background 0.2s; white-space: nowrap;
+  }
+  .check-btn:hover { background: var(--accent-dark); }
+  .checker-result {
+    margin-top: 1.2rem; padding: 1.1rem 1.3rem;
+    border-radius: 12px; font-size: 0.88rem; display: none; font-weight: 600;
+  }
+  .result-available { background: var(--accent-light); border: 1.5px solid rgba(58,107,74,0.3); color: var(--accent-dark); }
+  .result-unavailable { background: #fff3f3; border: 1.5px solid rgba(220,80,80,0.2); color: #c05050; }
+
+  /* ── BOOKING FORM ── */
+  .booking { background: var(--bg); }
+  .booking-inner { max-width: 600px; margin: 0 auto; }
+  .booking-inner .section-label,
+  .booking-inner h2,
+  .booking-inner .section-sub { text-align: center; }
+  .booking-inner .section-sub { margin: 0 auto 2.5rem; }
+  .form-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 24px; padding: 2.4rem;
+    box-shadow: var(--shadow);
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.45rem; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label { font-size: 0.8rem; font-weight: 800; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+  .form-input {
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 0.8rem 1.1rem;
+    color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.93rem; font-weight: 600;
+    outline: none; transition: border-color 0.2s; width: 100%;
+  }
+  .form-input:focus { border-color: var(--accent); background: #fff; }
+  .form-input::placeholder { color: #ccc; font-weight: 500; }
+  select.form-input { appearance: none; cursor: pointer; }
+  .submit-btn {
+    width: 100%; margin-top: 1.4rem;
+    background: var(--accent); color: #fff; border: none; padding: 1rem;
+    border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 800; cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .submit-btn:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,144,164,0.3); }
+  .form-note {
+    text-align: center; font-size: 0.8rem; color: var(--muted);
+    margin-top: 1rem; line-height: 1.5; font-weight: 600;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: rgba(45,45,45,0.45); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 24px; padding: 3rem; max-width: 420px; width: 90%;
+    text-align: center; animation: scaleIn 0.3s ease;
+    box-shadow: var(--shadow-lg);
+  }
+  @keyframes scaleIn { from { opacity:0; transform:scale(0.93) } to { opacity:1; transform:none } }
+  .modal-icon {
+    width: 62px; height: 62px; border-radius: 50%;
+    background: var(--accent-light); border: 2px solid rgba(58,107,74,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem; margin: 0 auto 1.4rem;
+  }
+  .modal h3 { font-family: 'Lora', serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 0.7rem; }
+  .modal p { color: var(--muted); font-size: 0.92rem; line-height: 1.7; font-weight: 500; }
+  .modal-close {
+    margin-top: 1.8rem; padding: 0.7rem 2rem;
+    background: transparent; border: 2px solid var(--border);
+    border-radius: 50px; color: var(--text); cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700;
+    transition: border-color 0.2s;
+  }
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--white); border-top: 1px solid var(--border);
+    padding: 2.8rem 4rem; text-align: center;
+  }
+  .footer-logo {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.15rem;
+    color: var(--accent-dark); margin-bottom: 0.8rem;
+  }
+  .footer-logo span { color: var(--warm); }
+  footer p { color: var(--muted); font-size: 0.85rem; line-height: 1.7; font-weight: 500; }
+  .footer-disclaimer { margin-top: 1rem; font-size: 0.76rem; color: #bbb; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 1.5rem; }
+    .hero { padding: 7rem 1.5rem 3rem; }
+    .hero-stats { gap: 1.8rem; }
+    .input-row { flex-direction: column; }
+    .form-grid { grid-template-columns: 1fr; }
+    footer { padding: 2rem 1.5rem; }
+  }
+
+  /* ── INTRO ── */
+  .intro { background: var(--bg); padding: 2rem 4rem; }
+  .intro-inner {
+    display: flex; align-items: center; gap: 2rem;
+    max-width: 860px; margin: 0 auto;
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 1.6rem 2rem;
+    box-shadow: var(--shadow);
+  }
+  .intro-photo {
+    width: 110px; height: 110px; border-radius: 50%;
+    object-fit: cover; object-position: center center;
+    flex-shrink: 0;
+    border: 3px solid var(--accent-light);
+    box-shadow: 0 4px 16px rgba(74,144,164,0.12);
+  }
+  .intro-text h3 {
+    font-family: 'Lora', serif; font-size: 1.1rem;
+    font-weight: 600; margin-bottom: 0.4rem; color: var(--text);
+  }
+  .intro-text p {
+    color: var(--muted); font-size: 0.85rem; line-height: 1.65; font-weight: 500;
+    font-family: 'Lora', serif; font-style: italic;
+  }
+  .intro-sig {
+    margin-top: 0.6rem; font-family: 'Lora', serif;
+    font-style: italic; font-size: 0.95rem; color: var(--accent-dark);
+  }
+  @media (max-width: 640px) {
+    .intro-inner { flex-direction: column; text-align: center; padding: 2rem; gap: 1.5rem; }
+  }
+
+
+  /* ── PLAN PRICE HIDDEN ── */
+  .plan-price-hidden {
+    font-size: 0.82rem; color: var(--accent); font-weight: 700;
+    margin: 0.8rem 0; padding: 0.5rem 0.9rem;
+    background: var(--accent-light); border-radius: 50px;
+    display: inline-block;
+  }
+
+  /* ── BENEFITS STRIP ── */
+  .benefits-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-top: 1.2rem;
+  }
+  .benefit-item {
+    display: flex; align-items: center; gap: 0.4rem;
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 0.45rem 0.8rem;
+    font-size: 0.78rem; font-weight: 700; color: var(--text);
+  }
+  @media (min-width: 640px) {
+    .benefits-strip { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  /* ── PRICING REVEAL CARDS ── */
+  .pricing-reveal { display: grid; gap: 0.9rem; margin-top: 0.5rem; }
+  .price-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 1.2rem 1.4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 0.8rem;
+  }
+  .price-card-left { display: flex; flex-direction: column; gap: 0.2rem; }
+  .price-card-name { font-weight: 800; font-size: 0.95rem; color: var(--text); }
+  .price-card-speed { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+  .price-card-right { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .price-amount { font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 600; color: var(--accent-dark); }
+  .price-amount span { font-size: 0.8rem; color: var(--muted); font-family: 'Nunito', sans-serif; }
+  .gift-tag {
+    background: #fff8f0; border: 1.5px solid rgba(232,147,90,0.35);
+    border-radius: 50px; padding: 0.3rem 0.9rem;
+    font-size: 0.78rem; font-weight: 800; color: var(--warm);
+  }
+  .price-select-btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 0.45rem 1.1rem; border-radius: 50px;
+    font-family: 'Nunito', sans-serif; font-size: 0.82rem;
+    font-weight: 700; cursor: pointer; transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .price-select-btn:hover { background: var(--accent-dark); }
+
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--white);
+    border-right: 1.5px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top: 62px; left: 0; bottom: 0; z-index: 100;
+    transition: transform 0.3s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+  }
+
+  /* Desktop & iPad (all sizes): sidebar always visible, content pushed right */
+  @media (min-width: 768px) {
+    .sidebar { transform: none !important; position: fixed; }
+    .page-wrapper { margin-left: var(--sidebar-w) !important; }
+    .sticky-header { left: var(--sidebar-w) !important; }
+    .promo-banner { left: var(--sidebar-w) !important; }
+    .hamburger { display: none !important; }
+    .sidebar-overlay { display: none !important; }
+  }
+
+  /* Mobile only: sidebar slides in over content */
+  @media (max-width: 767px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .page-wrapper { margin-left: 0 !important; }
+    .hamburger { display: flex !important; }
+  }
+
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0; z-index: 99;
+    background: rgba(0,0,0,0.3);
+  }
+  .sidebar-overlay.open { display: block; }
+  .sidebar-header {
+    padding: 1.4rem 1.5rem 1.2rem;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .sidebar-logo { font-weight: 800; font-size: 1.1rem; color: var(--accent-dark); }
+  .sidebar-logo span { color: var(--warm); }
+  .sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; list-style: none; }
+  .sidebar-nav li a {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.75rem 1.5rem; text-decoration: none;
+    color: var(--muted); font-weight: 700; font-size: 0.9rem;
+    border-radius: 0 50px 50px 0; margin-right: 1rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  .sidebar-nav li a:hover, .sidebar-nav li a.active {
+    background: var(--accent-light); color: var(--accent-dark);
+  }
+  .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: var(--red); color: var(--white);
+    font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.5rem;
+    border-radius: 50px; min-width: 18px; text-align: center;
+  }
+  .sidebar-cta {
+    margin: 0 1rem;
+    background: var(--accent); color: var(--white); border: none;
+    padding: 0.85rem 1.2rem; border-radius: 50px;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem;
+    cursor: pointer; text-decoration: none; display: block; text-align: center;
+    transition: background 0.2s;
+  }
+  .sidebar-cta:hover { background: var(--accent-dark); }
+  .sidebar-phone {
+    margin: 1rem 1rem 0; padding: 0.8rem 1rem;
+    background: var(--bg); border-radius: 12px; border: 1.5px solid var(--border);
+    text-align: center;
+  }
+  .sidebar-phone a { color: var(--accent-dark); font-weight: 800; font-size: 0.85rem; text-decoration: none; }
+  .sidebar-phone p { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; font-weight: 600; }
+  .hamburger {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 0.5rem 0.7rem; cursor: pointer;
+    font-size: 1.2rem; line-height: 1; display: none;
+    align-items: center; justify-content: center;
+  }
+
+    .fiber-hero { padding: 4rem 1.5rem 2rem; }
+    .news-section { padding: 3rem 1.5rem; }
+  }
+
+
+  /* ── REVIEWS ── */
+  .reviews-section { background: var(--white); padding: 5rem 4rem; }
+  .reviews-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+    gap: 1.2rem; margin-top: 2rem;
+  }
+  .review-card {
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 1.6rem;
+    transition: box-shadow 0.3s, transform 0.3s;
+  }
+  .review-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+  .review-stars { color: #f5a623; font-size: 1.1rem; margin-bottom: 0.7rem; letter-spacing: 0.05em; }
+  .review-text { font-size: 0.9rem; color: var(--muted); line-height: 1.7; font-style: italic; font-family: 'Lora', serif; margin-bottom: 1rem; }
+  .review-author { font-size: 0.82rem; font-weight: 800; color: var(--text); }
+  .review-location { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+  .leave-review-btn {
+    display: inline-block; margin-top: 2rem;
+    background: transparent; color: var(--accent);
+    border: 2px solid var(--accent); padding: 0.8rem 2rem;
+    border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 0.92rem; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .leave-review-btn:hover { background: var(--accent-light); }
+
+  /* Review modal */
+  .review-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: rgba(45,45,45,0.45); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  .review-modal-overlay.active { display: flex; }
+  .review-modal {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 24px; padding: 2.5rem; max-width: 460px; width: 92%;
+    animation: scaleIn 0.3s ease; box-shadow: var(--shadow-lg);
+  }
+  .review-modal h3 { font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .review-modal p { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.5rem; font-weight: 500; }
+  .star-selector { display: flex; gap: 0.4rem; margin-bottom: 1.2rem; }
+  .star-selector span {
+    font-size: 2rem; cursor: pointer; transition: transform 0.15s;
+    color: #ddd; line-height: 1;
+  }
+  .star-selector span:hover,
+  .star-selector span.selected { color: #f5a623; transform: scale(1.15); }
+  .review-submit-btn {
+    width: 100%; background: var(--accent); color: #fff; border: none;
+    padding: 0.9rem; border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 0.95rem; cursor: pointer;
+    transition: background 0.2s; margin-top: 1rem;
+  }
+  .review-submit-btn:hover { background: var(--accent-dark); }
+  .review-cancel-btn {
+    width: 100%; background: transparent; color: var(--muted);
+    border: 1.5px solid var(--border); padding: 0.75rem; border-radius: 50px;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem;
+    cursor: pointer; margin-top: 0.6rem; transition: border-color 0.2s;
+  }
+  .review-cancel-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── WHY BOOK THROUGH ME ── */
+  .why-direct { background: linear-gradient(135deg, #e8f2eb, #f0f5ec); padding: 2rem 4rem; }
+  .why-direct-inner {
+    max-width: 820px; margin: 0 auto;
+    display: flex; gap: 2rem; align-items: center;
+  }
+  .why-direct-icon {
+    font-size: 2.2rem; flex-shrink: 0;
+  }
+  .why-direct h2 { font-family: 'Lora', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .why-direct p { color: var(--muted); font-size: 0.88rem; line-height: 1.65; font-weight: 500; }
+  .why-direct strong { color: var(--accent-dark); font-weight: 800; }
+  @media (max-width: 640px) {
+    .why-direct { padding: 3rem 1.5rem; }
+    .why-direct-inner { flex-direction: column; gap: 1.5rem; text-align: center; }
+    .reviews-section { padding: 4rem 1.5rem; }
+  }
+
+  /* ── PRIVACY NOTE ── */
+  .privacy-bar {
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 1rem 4rem; text-align: center;
+    font-size: 0.8rem; color: var(--muted); font-weight: 600;
+  }
+
+  /* ── CALENDAR BOOKING ── */
+  .cal-section { background: var(--bg); padding: 5rem 4rem; }
+  .cal-inner { max-width: 700px; margin: 0 auto; }
+  .cal-inner .section-sub { margin-bottom: 2rem; }
+  .cal-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 2rem; box-shadow: var(--shadow);
+  }
+  .cal-step { margin-bottom: 1.8rem; }
+  .cal-step-label { font-size: 0.78rem; font-weight: 800; color: var(--warm); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .day-grid {
+    display: flex; gap: 0.6rem; flex-wrap: wrap;
+  }
+  .day-btn {
+    padding: 0.55rem 1rem; border-radius: 50px; border: 1.5px solid var(--border);
+    background: var(--bg); font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; color: var(--text);
+    transition: all 0.2s;
+  }
+  .day-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .day-btn.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .day-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+  .time-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(100px,1fr));
+    gap: 0.6rem; margin-top: 0.8rem;
+  }
+  .time-btn {
+    padding: 0.6rem 0.5rem; border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--bg); font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem; font-weight: 700; cursor: pointer; color: var(--text);
+    transition: all 0.2s; text-align: center;
+  }
+  .time-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .time-btn.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .time-btn.booked { background: #f5f5f5; color: #ccc; border-color: #eee; cursor: not-allowed; pointer-events: none; }
+  .time-btn.blocked { background: #fff3f3; color: #dbb; border-color: #f0ddd; cursor: not-allowed; pointer-events: none; }
+  .cal-legend { display: flex; gap: 1.2rem; flex-wrap: wrap; margin-top: 0.8rem; }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .tz-note { font-size: 0.78rem; color: var(--muted); font-weight: 600; margin-top: 0.5rem; }
+
+
+  /* ── STICKY HEADER ── */
+  .sticky-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 150;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.85rem 1.5rem;
+    background: rgba(247,244,239,0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1.5px solid var(--border);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    height: 62px;
+  }
+  .sticky-left {
+    display: flex; align-items: center;
+    width: 80px;
+  }
+  .sticky-hamburger {
+    background: transparent; border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 0.4rem 0.65rem;
+    cursor: pointer; font-size: 1.15rem; color: var(--text);
+    transition: background 0.2s, border-color 0.2s;
+    line-height: 1;
+  }
+  .sticky-hamburger:hover { background: var(--accent-light); border-color: var(--accent); }
+  .sticky-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.15rem;
+    color: var(--accent-dark); text-decoration: none; letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .sticky-center span { color: var(--warm); }
+  .sticky-center:hover { opacity: 0.8; }
+  .sticky-right {
+    display: flex; align-items: center;
+    width: 80px; justify-content: flex-end;
+  }
+  .sticky-book-btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 0.55rem 1.2rem; border-radius: 50px;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; transition: background 0.2s, transform 0.2s;
+    white-space: nowrap; text-decoration: none;
+  }
+  .sticky-book-btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+  /* Push page content down to account for sticky header */
+  body.has-sidebar .sidebar { top: 62px; }
+  /* Hide old hamburger button since header replaces it */
+  .hamburger { display: none !important; }
+
+
+  /* ── WHY ME COMPACT LIST ── */
+  .why-list {
+    list-style: none; margin-top: 1.2rem;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .why-list-item {
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 0.7rem 0.9rem;
+  }
+  .why-list-title {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.82rem; font-weight: 800; color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+  .why-list-title span { font-size: 0.9rem; }
+  .why-list-bullets { list-style: none; padding: 0; margin: 0; }
+  .why-list-bullets li {
+    font-size: 0.74rem; color: var(--muted); font-weight: 600;
+    line-height: 1.45; padding: 0.1rem 0;
+    display: flex; align-items: flex-start; gap: 0.3rem;
+  }
+  .why-list-bullets li::before { content: "•"; color: var(--accent); font-weight: 800; flex-shrink: 0; }
+  @media (max-width: 480px) {
+    .why-list { grid-template-columns: 1fr; }
+  }
+
+
+  /* ── TEXT ME WIDGET ── */
+  .text-widget {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 500;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 0.6rem;
+  }
+  .text-bubble {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px 16px 4px 16px;
+    padding: 1rem 1.2rem; max-width: 240px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeUp 0.4s ease both;
+    position: relative;
+  }
+  .text-bubble-close {
+    position: absolute; top: 0.4rem; right: 0.6rem;
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 0.9rem; line-height: 1;
+    padding: 0;
+  }
+  .text-bubble-close:hover { color: var(--text); }
+  .text-bubble p {
+    font-size: 0.82rem; font-weight: 600; color: var(--text);
+    line-height: 1.5; margin-top: 0.2rem; padding-right: 0.8rem;
+  }
+  .text-bubble p span { color: var(--accent-dark); font-weight: 800; }
+  .text-bubble-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    margin-top: 0.7rem; background: var(--accent); color: #fff;
+    border: none; border-radius: 50px; padding: 0.5rem 1.1rem;
+    font-family: 'Nunito', sans-serif; font-size: 0.82rem;
+    font-weight: 800; cursor: pointer; text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .text-bubble-btn:hover { opacity: 0.85; }
+  .text-fab {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--accent); color: #fff; border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(58,107,74,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .text-fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(58,107,74,0.5); }
+
+
+  /* ── FAQ PAGE ── */
+  .faq-page { padding: 5rem 4rem 3rem; max-width: 760px; margin: 0 auto; }
+  .faq-category { margin-bottom: 2.5rem; }
+  .faq-category-title {
+    font-size: 0.75rem; font-weight: 800; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--warm);
+    margin-bottom: 1rem; padding-bottom: 0.5rem;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .faq-item {
+    border: 1.5px solid var(--border); border-radius: 12px;
+    margin-bottom: 0.6rem; overflow: hidden;
+    background: var(--white); transition: box-shadow 0.2s;
+  }
+  .faq-item:hover { box-shadow: var(--shadow); }
+  .faq-question {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 1rem 1.2rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; font-family: 'Nunito', sans-serif;
+    font-size: 0.92rem; font-weight: 800; color: var(--text);
+    line-height: 1.4;
+  }
+  .faq-question:hover { color: var(--accent-dark); }
+  .faq-chevron {
+    font-size: 0.75rem; color: var(--accent);
+    transition: transform 0.25s; flex-shrink: 0;
+  }
+  .faq-answer {
+    display: none; padding: 0 1.2rem 1rem;
+    font-size: 0.88rem; color: var(--muted);
+    line-height: 1.75; font-weight: 500;
+    border-top: 1px solid var(--border);
+    padding-top: 0.8rem;
+  }
+  .faq-answer a { color: var(--accent); font-weight: 700; text-decoration: none; }
+  .faq-answer a:hover { text-decoration: underline; }
+  @media (max-width: 768px) {
+    .faq-page { padding: 4rem 1.5rem 2rem; }
+  }
+
+
+  /* ── PROMO BANNER ── */
+  .promo-banner {
+    position: fixed; top: 62px; left: 0; right: 0; z-index: 149;
+    background: linear-gradient(90deg, #2a5238, #3a6b4a);
+    color: #fff; padding: 0.6rem 3rem;
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.8rem; text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .promo-banner p {
+    font-size: 0.84rem; font-weight: 700; line-height: 1.4;
+    color: #fff;
+  }
+  .promo-banner p span { color: #ffe082; font-weight: 800; }
+  .promo-banner-link {
+    background: #fff; color: var(--accent-dark);
+    border: none; border-radius: 50px;
+    padding: 0.3rem 0.9rem; font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem; font-weight: 800; cursor: pointer;
+    text-decoration: none; white-space: nowrap;
+    transition: opacity 0.2s; flex-shrink: 0;
+  }
+  .promo-banner-link:hover { opacity: 0.85; }
+  .promo-banner-close {
+    position: absolute; right: 1rem;
+    background: none; border: none; color: rgba(255,255,255,0.8);
+    font-size: 1rem; cursor: pointer; padding: 0.2rem 0.4rem;
+    line-height: 1; transition: color 0.2s;
+  }
+  .promo-banner-close:hover { color: #fff; }
+
+  /* Push page content down when banner is visible */
+  body.banner-visible .page-content { padding-top: calc(62px + 42px); }
+  body.banner-visible .sidebar { top: calc(62px + 42px); }
+
+
+  /* ── PLAN GIFT & PRICE TAGS ── */
+  .plan-price-tag {
+    font-size: 1.6rem; font-weight: 800; color: var(--text);
+    margin: 0.3rem 0; font-family: 'Nunito', sans-serif;
+  }
+  .plan-price-tag span { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+  .plan-gift {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: linear-gradient(135deg, #fff8e6, #fff3d0);
+    border: 1.5px solid #e8c96a;
+    border-radius: 50px; padding: 0.35rem 1rem;
+    font-size: 0.8rem; font-weight: 800; color: #a07820;
+    margin-bottom: 0.8rem;
+  }
+  .no-gift {
+    background: #f5f5f5; border: 1.5px solid #e0e0e0;
+    color: var(--muted); font-weight: 600;
+  }
+  .plan-limited {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: #fff8f0; border: 1.5px solid #f0c080;
+    border-radius: 50px; padding: 0.3rem 0.9rem;
+    font-size: 0.75rem; font-weight: 700; color: #a06820;
+    margin-bottom: 0.6rem;
+  }
+
+
+  /* ── BRIAN BONUS BADGE ── */
+  .plan-brian-bonus {
+    display: flex; align-items: center; gap: 0.4rem;
+    background: linear-gradient(135deg, #e8f2eb, #d4eadb);
+    border: 1.5px solid rgba(58,107,74,0.3);
+    border-radius: 50px; padding: 0.35rem 1rem;
+    font-size: 0.78rem; font-weight: 700; color: var(--accent-dark);
+    margin-bottom: 0.8rem;
+  }
+  .plan-brian-bonus strong { font-weight: 800; }
+
+
+  /* ── COMPARISON CARDS ── */
+  .comparison-cards { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+  .comp-item { border-radius: 12px; overflow: hidden; border: 1.5px solid var(--border); }
+  .comp-label {
+    background: var(--text); color: #fff;
+    padding: 0.5rem 1rem; font-size: 0.78rem; font-weight: 800;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .comp-row { display: grid; grid-template-columns: 1fr 1fr; }
+  .comp-fiber {
+    background: var(--accent-light); color: var(--accent-dark);
+    padding: 0.8rem 1rem; font-size: 0.8rem; font-weight: 600; line-height: 1.5;
+    border-right: 1.5px solid var(--border);
+  }
+  .comp-fiber strong { display: block; font-weight: 800; font-size: 0.85rem; margin-top: 0.2rem; }
+  .comp-dsl {
+    background: #f5f5f5; color: var(--muted);
+    padding: 0.8rem 1rem; font-size: 0.8rem; font-weight: 600; line-height: 1.5;
+  }
+  .comp-dsl strong { display: block; font-weight: 800; font-size: 0.85rem; margin-top: 0.2rem; color: #888; }
+
+
+  /* ── SCROLL ANIMATIONS ── */
+  #page-home .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  #page-home .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+
+  /* ── PAGES ── */
+  .page { display: none !important; }
+  .page.active { display: block !important; min-height: 50vh; }
+
+  /* ── PAGE WRAPPER ── */
+  .page-wrapper {
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+  }
+  @media (min-width: 900px) {
+    .page-wrapper { margin-left: var(--sidebar-w); padding-top: 62px; }
+  }
+  @media (max-width: 767px) {
+    .page-wrapper { margin-left: 0 !important; padding-top: 62px; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- STICKY HEADER -->
+<!-- STICKY HEADER -->
+<header class="sticky-header">
+  <div class="sticky-left">
+    <button class="sticky-hamburger" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
+  </div>
+  <a class="sticky-center" href="#" onclick="showPage('page-home'); window.scrollTo(0,0); return false;">
+    Your<span>FiberRep</span>
+  </a>
+  <div class="sticky-right">
+    <button class="sticky-book-btn" onclick="showPage('page-booking')">Book a Call</button>
+  </div>
+</header>
+
+<button class="hamburger" onclick="toggleSidebar()" id="hamburgerBtn">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+
+<!-- PROMO BANNER -->
+<div class="promo-banner" id="promoBanner">
+  <p>🎁 Sign up through Brian and get an <span>extra $100 gift card</span> + <span>free installation</span> — not available going direct!</p>
+  <a class="promo-banner-link" href="#" onclick="showPage('page-booking'); closeBanner();" style="cursor:pointer;">Claim Offer →</a>
+  <button onclick="closeBanner()" style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:1rem;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;">✕</button>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">Your<span>FiberRep</span></div>
+  <ul class="sidebar-nav">
+    <li><a href="#" class="active" id="nav-home" onclick="showPage('page-home'); return false;"><span class="nav-icon">🏠</span> Home</a></li>
+    <li><a href="#" id="nav-plans" onclick="showPage('page-plans'); return false;"><span class="nav-icon">📋</span> Plans</a></li>
+    <li><a href="#" id="nav-checker" onclick="showPage('page-checker'); return false;"><span class="nav-icon">📍</span> Check Your Address</a></li>
+    <li><a href="#" id="nav-booking" onclick="showPage('page-booking'); return false;"><span class="nav-icon">📞</span> Book a Call</a></li>
+    <li><a href="#" id="nav-fiber" onclick="showPage('page-fiber'); return false;"><span class="nav-icon">⚡</span> Why Fiber?</a></li>
+    <li><a href="#" id="nav-reviews" onclick="showPage('page-reviews'); return false;"><span class="nav-icon">⭐</span> Reviews</a></li>
+    <li><a href="#" id="nav-faq" onclick="showPage('page-faq'); return false;"><span class="nav-icon">❓</span> FAQs</a></li>
+  </ul>
+  <a href="#" onclick="showPage('page-booking'); return false;" class="sidebar-cta">Book a Free Call →</a>
+  <div class="sidebar-phone">
+    <a href="tel:+13472448760">📞 (347) 244-8760</a>
+    <p>If no answer, I'll call you back!</p>
+  </div>
+</aside>
+
+<div class="page-wrapper">
+<!-- ═══ PAGES ═══ -->
+
+<div id="page-fiber" class="page">
+  <div class="fiber-hero">
+    <div class="section-label">The Future of Internet</div>
+    <h1>Why Fiber is the<br>Smart Choice.</h1>
+    <p>Most homes in America are still running on old copper DSL or coaxial cable. Fiber optic internet is a completely different technology — and the difference in everyday life is enormous.</p>
+  </div>
+
+  <section style="padding:3rem 4rem; background:var(--bg);">
+    <div class="section-label">Side by Side</div>
+    <h2>Fiber vs DSL / Cable</h2>
+    <p class="section-sub" style="margin-bottom:1.5rem;">Here's how Brightspeed Fiber stacks up against the old copper technology most providers still use.</p>
+    <div class="comparison-cards">
+
+  <div class="comp-item">
+    <div class="comp-label">Download Speed</div>
+    <div class="comp-row">
+      <div class="comp-fiber">⚡ Brightspeed Fiber<br><strong>Up to 8,000 Mbps</strong></div>
+      <div class="comp-dsl">DSL / Cable<br><strong>Typically 25–100 Mbps</strong></div>
+    </div>
+  </div>
+
+  <div class="comp-item">
+    <div class="comp-label">Upload Speed</div>
+    <div class="comp-row">
+      <div class="comp-fiber">⚡ Brightspeed Fiber<br><strong>Equal to download speed</strong></div>
+      <div class="comp-dsl">DSL / Cable<br><strong>Often as low as 5–20 Mbps</strong></div>
+    </div>
+  </div>
+
+  <div class="comp-item">
+    <div class="comp-label">Reliability</div>
+    <div class="comp-row">
+      <div class="comp-fiber">⚡ Brightspeed Fiber<br><strong>Highly consistent</strong></div>
+      <div class="comp-dsl">DSL / Cable<br><strong>Slows at peak times</strong></div>
+    </div>
+  </div>
+
+  <div class="comp-item">
+    <div class="comp-label">Latency / Lag</div>
+    <div class="comp-row">
+      <div class="comp-fiber">⚡ Brightspeed Fiber<br><strong>Very low — ideal for gaming</strong></div>
+      <div class="comp-dsl">DSL / Cable<br><strong>Higher latency, noticeable lag</strong></div>
+    </div>
+  </div>
+
+  <div class="comp-item">
+    <div class="comp-label">Future-Proof</div>
+    <div class="comp-row">
+      <div class="comp-fiber">⚡ Brightspeed Fiber<br><strong>Built for the next 30+ years</strong></div>
+      <div class="comp-dsl">DSL / Cable<br><strong>Being phased out nationally</strong></div>
+    </div>
+  </div>
+
+  <div class="comp-item">
+    <div class="comp-label">Price Lock</div>
+    <div class="comp-row">
+      <div class="comp-fiber">⚡ Brightspeed Fiber<br><strong>1-Year price guarantee</strong></div>
+      <div class="comp-dsl">DSL / Cable<br><strong>Prices often increase</strong></div>
+    </div>
+  </div>
+
+  <div class="comp-item">
+    <div class="comp-label">Equipment</div>
+    <div class="comp-row">
+      <div class="comp-fiber">⚡ Brightspeed Fiber<br><strong>No rental fees — router included</strong></div>
+      <div class="comp-dsl">DSL / Cable<br><strong>Monthly router rental common</strong></div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+  <section style="padding:3rem 4rem; background:var(--white);">
+    <div class="section-label">Real Life Impact</div>
+    <h2>What fiber means for your home.</h2>
+    <p class="section-sub" style="margin-bottom:1.5rem;">Fiber doesn't just mean faster Netflix. Here's where you'll actually feel the difference day to day.</p>
+    <div class="use-cases">
+      <div class="use-case-card">
+        <div class="use-case-icon">📷</div>
+        <h3>Home Security Cameras</h3>
+        <p>Security cameras constantly upload footage to the cloud. With DSL's weak upload speeds, cameras buffer, drop frames, or fail to record. <span class="use-case-highlight">Fiber's equal upload speed keeps every camera running smoothly, 24/7.</span></p>
+      </div>
+      <div class="use-case-card">
+        <div class="use-case-icon">💻</div>
+        <h3>Working From Home</h3>
+        <p>Video calls, large file uploads, and cloud platforms all depend on upload speed. Poor upload = frozen calls and slow transfers. <span class="use-case-highlight">Fiber gives you the upload speed your job demands.</span></p>
+      </div>
+      <div class="use-case-card">
+        <div class="use-case-icon">🎮</div>
+        <h3>Online Gaming</h3>
+        <p>Gaming isn't just about speed — it's about latency. High latency means lag and lost games. <span class="use-case-highlight">Fiber's low latency gives you a real competitive edge.</span></p>
+      </div>
+      <div class="use-case-card">
+        <div class="use-case-icon">📺</div>
+        <h3>4K Streaming & Smart TVs</h3>
+        <p>4K streaming uses up to 25 Mbps per screen. With multiple TVs and devices, cable internet struggles. <span class="use-case-highlight">Fiber handles every screen in the house without breaking a sweat.</span></p>
+      </div>
+      <div class="use-case-card">
+        <div class="use-case-icon">🏠</div>
+        <h3>Smart Home Devices</h3>
+        <p>Smart doorbells, thermostats, voice assistants, and more all need a reliable connection. <span class="use-case-highlight">Fiber supports dozens of devices simultaneously without slowdowns.</span></p>
+      </div>
+      <div class="use-case-card">
+        <div class="use-case-icon">👨‍👩‍👧‍👦</div>
+        <h3>Multiple Users at Once</h3>
+        <p>When everyone's home — streaming, gaming, on calls — cable internet can't keep up. <span class="use-case-highlight">Fiber splits bandwidth evenly so nobody slows anyone else down.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="news-section">
+    <div class="section-label">What's Happening Nationally</div>
+    <h2>The US is going fiber — fast.</h2>
+    <p class="section-sub" style="margin-bottom:0.5rem;">The government has invested billions to replace old copper infrastructure with fiber across the country. Here's what's happening right now.</p>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-source">Fiber Broadband Association</div>
+        <h3>Record 10.3 Million US Homes Passed with Fiber in 2024</h3>
+        <p>Fiber deployments hit a new annual record in 2024. There are now 88.1 million US homes passed with fiber, with the 2025–2029 period expected to see a 50%+ increase in homes reached.</p>
+        <a class="news-link" href="https://fiberbroadband.org/2025/01/23/fiber-broadband-association-reports-record-fiber-to-the-home-deployment-in-2024/" target="_blank">Read the full report →</a>
+      </div>
+      <div class="news-card">
+        <div class="news-source">NTIA.gov — US Government</div>
+        <h3>$42.45 Billion Federal Investment to Connect Every American</h3>
+        <p>The Bipartisan Infrastructure Law's BEAD program is the single largest federal broadband investment in US history — designed to bring high-speed internet to every unserved and underserved community in America.</p>
+        <a class="news-link" href="https://www.ntia.gov/funding-programs/high-speed-internet-programs/broadband-equity-access-and-deployment-bead-program" target="_blank">Read on NTIA.gov →</a>
+      </div>
+      <div class="news-card">
+        <div class="news-source">NetPMD — January 2025</div>
+        <h3>Fiber Now Passes More Than 50% of US Households</h3>
+        <p>As of 2024, fiber broadband has reached a critical milestone, passing over half of all US homes. In 2023 alone, nine million new homes were connected — a 13% year-over-year increase.</p>
+        <a class="news-link" href="https://netpmd.com/the-status-of-fiber-deployment-in-the-us/" target="_blank">Read the full article →</a>
+      </div>
+      <div class="news-card">
+        <div class="news-source">Nation On Demand — 2026</div>
+        <h3>BEAD Program: The Nationwide Broadband Transformation Has Begun</h3>
+        <p>By 2025, most states completed their planning phases and are now awarding grants and beginning the first wave of fiber builds. This marks the true beginning of America's national broadband transformation.</p>
+        <a class="news-link" href="https://nationalondemand.com/federal-bead-program/" target="_blank">Read the full article →</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:3rem 4rem; background:var(--bg); text-align:center;">
+    <h2>Ready to make the switch?</h2>
+    <p style="color:var(--muted); font-size:1rem; margin:0.8rem auto 2rem; max-width:480px; font-weight:500;">Brightspeed Fiber is already available in your area. Book a free call with Brian and he'll get you set up — no hassle, no commitment.</p>
+    <a href="#" onclick="showPage('page-booking'); return false;" class="btn-primary">Book a Free Call →</a>
+  </section>
+</div>
+
+
+
+<!-- STANDALONE: PLANS PAGE -->
+
+<div id="page-plans" class="page">
+  <div style="max-width:900px; margin:0 auto; padding:2rem 1.5rem 3rem;">
+    <div class="section-label">Brightspeed Fiber Plans</div>
+    <h2>Choose your speed.</h2>
+    <p class="section-sub" style="margin-bottom:0.8rem;">All plans include equal upload &amp; download speeds, free installation, no contract, and a 1-year price lock guarantee. Enter your address to unlock exact pricing.</p>
+    <p style="margin-bottom:2rem; font-size:0.85rem; color:var(--accent-dark); font-weight:700; background:var(--accent-light); padding:0.8rem 1.1rem; border-radius:10px;">⭐ Sign up through Brian and get an <strong>extra $100 gift card + free installation</strong> — not available going direct!</p>
+    <div class="plans-grid">
+
+      <div class="plan-card">
+        <div class="plan-speed">200<span> Mbps</span></div>
+        <div class="plan-name">Basic Plan — Fiber</div>
+        <div class="plan-price-tag">$29.99<span>/mo</span></div>
+        <div class="plan-gift no-gift">No gift card on this plan</div>
+        <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+        <ul class="plan-features">
+          <li>200 Mbps Download &amp; Upload</li>
+          <li>Best for small households</li>
+          <li>Everyday browsing &amp; streaming</li>
+          <li>WiFi 6 Router Included</li>
+          <li>No Contract</li>
+          <li>No Payment for 21 Days</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="showPage('page-booking')">Book a Call</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-speed">500<span> Mbps</span></div>
+        <div class="plan-name">Mid-Tier Plan — Fiber</div>
+        <div class="plan-price-tag">$39.99<span>/mo</span></div>
+        <div class="plan-gift">🎁 $150 Visa Gift Card</div>
+        <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+        <ul class="plan-features">
+          <li>500 Mbps Download &amp; Upload</li>
+          <li>Best for families</li>
+          <li>Streaming &amp; working from home</li>
+          <li>Multiple devices at once</li>
+          <li>WiFi 6 Router Included</li>
+          <li>No Contract</li>
+          <li>No Payment for 21 Days</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="showPage('page-booking')">Book a Call</button>
+      </div>
+
+      <div class="plan-card popular">
+        <div class="popular-tag">Most Popular</div>
+        <div class="plan-speed">1<span> Gig</span></div>
+        <div class="plan-name">High-Speed Plan — Fiber</div>
+        <div class="plan-price-tag">$39.99<span>/mo</span></div>
+        <div class="plan-gift">🎁 $200 Visa Gift Card</div>
+        <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+        <ul class="plan-features">
+          <li>1000 Mbps Download &amp; Upload</li>
+          <li>Heavy streaming &amp; gaming</li>
+          <li>Smart homes &amp; multiple devices</li>
+          <li>WiFi 7 Router Included</li>
+          <li>No Contract</li>
+          <li>No Payment for 21 Days</li>
+        </ul>
+        <button class="plan-btn plan-btn-filled" onclick="showPage('page-booking')">Book a Call</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-speed">2<span> Gig</span></div>
+        <div class="plan-name">Ultra-Fast Plan — Fiber</div>
+        <div class="plan-price-tag">$49.99<span>/mo</span></div>
+        <div class="plan-gift">🎁 $300 Visa Gift Card</div>
+        <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+        <ul class="plan-features">
+          <li>2000 Mbps Download &amp; Upload</li>
+          <li>Power users &amp; large households</li>
+          <li>Maximum performance</li>
+          <li>4K streaming, gaming &amp; more</li>
+          <li>WiFi 7 Router Included</li>
+          <li>No Contract</li>
+          <li>No Payment for 21 Days</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="showPage('page-booking')">Book a Call</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-speed">5<span> Gig</span></div>
+        <div class="plan-name">Hyper-Fast Plan — Fiber</div>
+        <div class="plan-price-tag">$79.99<span>/mo</span></div>
+        <div class="plan-gift">🎁 $300 Visa Gift Card</div>
+        <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+        <div class="plan-limited">⚠️ Available at select addresses only</div>
+        <ul class="plan-features">
+          <li>5000 Mbps Download &amp; Upload</li>
+          <li>Power users &amp; large households</li>
+          <li>Maximum performance</li>
+          <li>4K streaming, gaming &amp; more</li>
+          <li>WiFi 7 Router Included</li>
+          <li>No Contract</li>
+          <li>No Payment for 21 Days</li>
+          <li>1-Year Price Lock Guarantee</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="showPage('page-booking')">Book a Call</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-speed">8<span> Gig</span></div>
+        <div class="plan-name">Ultimate Plan — Fiber</div>
+        <div class="plan-price-tag">$109.99<span>/mo</span></div>
+        <div class="plan-gift">🎁 $300 Visa Gift Card</div>
+        <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+        <div class="plan-limited">⚠️ Available at select addresses only</div>
+        <ul class="plan-features">
+          <li>8000 Mbps Download &amp; Upload</li>
+          <li>Power users &amp; large households</li>
+          <li>Maximum performance</li>
+          <li>4K streaming, gaming &amp; more</li>
+          <li>WiFi 7 Router Included</li>
+          <li>No Contract</li>
+          <li>No Payment for 21 Days</li>
+          <li>1-Year Price Lock Guarantee</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="showPage('page-booking')">Book a Call</button>
+      </div>
+
+    </div>
+    <div style="text-align:center; margin-top:2.5rem; padding:1.5rem; background:var(--accent-light); border-radius:16px; border:1.5px solid rgba(58,107,74,0.2);">
+      <p style="font-size:0.92rem; font-weight:700; color:var(--accent-dark); margin-bottom:0.5rem;">Not sure which plan is right for you?</p>
+      <p style="font-size:0.85rem; color:var(--muted); font-weight:500; margin-bottom:1.2rem;">Book a free call and I'll find the perfect plan for your home — no pressure, no commitment.</p>
+      <button class="btn-primary" onclick="showPage('page-booking')" style="font-size:0.9rem;">Book a Free Call →</button>
+    </div>
+  </div>
+</div>
+
+<div id="page-booking" class="page">
+  <div style="max-width:660px; margin:0 auto; padding:2rem 1.5rem 3rem;">
+    <div class="section-label">Book a Call</div>
+    <h2>Let's get you connected.</h2>
+    <p class="section-sub" style="margin-bottom:2rem;">Fill in your details and I'll give you a call to get everything sorted — fast, easy, and on your terms.</p>
+    <div class="form-card">
+      <p style="font-size:0.85rem; color:var(--accent-dark); font-weight:700; margin-bottom:0.8rem; background:var(--accent-light); padding:0.8rem 1.1rem; border-radius:10px;">💡 Booking a call is completely free and zero commitment — it's just a friendly chat. You won't be signing up to anything today.</p>
+      <p style="font-size:0.85rem; color:#8a5a00; font-weight:700; margin-bottom:1.4rem; background:#fff8e6; padding:0.8rem 1.1rem; border-radius:10px; border:1.5px solid #e8c96a;">🎁 Don't forget — booking through Brian gets you an <strong>extra $100 gift card + free installation</strong>, not available going direct!</p>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">First Name <span style="color:#c05050;">*</span></label><input type="text" class="form-input" id="bFirstName" placeholder="John"></div>
+        <div class="form-group"><label class="form-label">Last Name <span style="color:var(--muted);font-weight:500;">(optional)</span></label><input type="text" class="form-input" id="bLastName" placeholder="Smith"></div>
+        <div class="form-group"><label class="form-label">Phone Number <span style="color:#c05050;">*</span></label><input type="tel" class="form-input" id="bPhone" placeholder="(555) 000-0000"></div>
+        <div class="form-group"><label class="form-label">Email Address <span style="color:var(--muted);font-weight:500;">(optional)</span></label><input type="email" class="form-input" id="bEmail" placeholder="john@example.com"></div>
+        <div class="form-group full"><label class="form-label">Home Address <span style="color:var(--muted);font-weight:500;">(optional)</span></label><input type="text" class="form-input" id="bAddress" placeholder="123 Main St, Avon Lake, OH 44012"></div>
+        <div class="form-group full"><label class="form-label">Preferred Plan <span style="color:var(--muted);font-weight:500;">(optional)</span></label>
+          <select class="form-input" id="bPlan">
+            <option value="">— Select a plan —</option>
+            <option>Basic Plan – 200 Mbps ($29.99/mo)</option>
+            <option>Mid-Tier Plan – 500 Mbps ($39.99/mo)</option>
+            <option>High-Speed Plan – 1 Gig ($39.99/mo)</option>
+            <option>Ultra-Fast Plan – 2 Gig ($49.99/mo)</option>
+            <option>Hyper-Fast Plan – 5 Gig ($79.99/mo)</option>
+            <option>Ultimate Plan – 8 Gig ($109.99/mo)</option>
+            <option>Not sure – help me choose</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Preferred Call Time <span style="color:#c05050;">*</span></label>
+          <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:1.2rem;margin-top:0.3rem;">
+            <div class="cal-step-label" style="margin-bottom:0.6rem;">Step 1 — Pick a Day</div>
+            <div class="day-grid" id="dayGrid2"></div>
+            <div id="timeStepInForm2" style="display:none;margin-top:1.2rem;">
+              <div class="cal-step-label" style="margin-bottom:0.4rem;">Step 2 — Pick a Time Slot</div>
+              <p class="tz-note">📍 All times in Miami time (ET)</p>
+              <div class="time-grid" id="timeGrid2"></div>
+              <div class="cal-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--accent);"></div> Available</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ccc;"></div> Already Booked</div>
+              </div>
+            </div>
+            <div id="calConfirmStep2" style="display:none;margin-top:1rem;padding:1rem;background:var(--accent-light);border-radius:10px;">
+              <p style="font-size:0.88rem;font-weight:700;color:var(--accent-dark);">✓ Selected: <span id="calSelectedTime2"></span></p>
+            </div>
+          </div>
+          <input type="hidden" id="selectedSlot2" value="">
+        </div>
+        <div class="form-group full"><label class="form-label">Anything else? <span style="color:var(--muted);font-weight:500;">(optional)</span></label><input type="text" class="form-input" id="bNotes" placeholder="e.g. Best time to call, current provider..."></div>
+      </div>
+      <button class="submit-btn" onclick="submitBookingForm()">Book My Call →</button>
+      <p class="form-note">🔒 Your details are only shared with your local rep. No spam, ever.</p>
+      <div style="margin-top:1.2rem;padding:1rem 1.2rem;background:var(--bg);border-radius:12px;border:1.5px solid var(--border);text-align:center;">
+        <p style="font-size:0.88rem;color:var(--muted);font-weight:600;line-height:1.7;">Prefer to call directly? <a href="tel:+13472448760" style="color:var(--accent-dark);font-weight:800;text-decoration:none;">(347) 244-8760</a><br>If I don't answer, I'll call you back at the earliest convenience.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STANDALONE: CHECK ADDRESS PAGE -->
+
+<div id="page-checker" class="page">
+  <div style="max-width:660px;margin:0 auto;padding:2rem 1.5rem 3rem;">
+    <div class="section-label">Availability &amp; Pricing</div>
+    <h2>Check your address.</h2>
+    <p class="section-sub" style="margin-bottom:2rem;">Enter your address or zip code to see which plans and pricing are available in your area.</p>
+    <div class="checker-inner" style="max-width:100%;">
+      <h3>What's available at your address?</h3>
+      <p>Enter your full address including zip code to unlock pricing and promotions for your area.</p>
+      <div class="input-row">
+        <input type="text" class="input-field" id="addressInput2" placeholder="e.g. 32812 Sorrento Ln, Avon Lake, OH 44012">
+        <button class="check-btn" onclick="checkAddress2()">Check</button>
+      </div>
+      <div class="checker-result" id="checkerResult2"></div>
+      <div id="planPricing2" style="display:none;margin-top:1.5rem;"></div>
+    </div>
+    <div style="margin-top:1.5rem;text-align:center;padding:1.2rem;background:var(--accent-light);border-radius:12px;">
+      <p style="font-size:0.88rem;font-weight:700;color:var(--accent-dark);margin-bottom:0.6rem;">Address not showing up?</p>
+      <p style="font-size:0.82rem;color:var(--muted);font-weight:600;margin-bottom:1rem;">Book a call and I'll check manually before we speak.</p>
+      <button class="btn-primary" onclick="showPage('page-booking')" style="font-size:0.88rem;padding:0.7rem 1.5rem;">Book a Free Call →</button>
+    </div>
+  </div>
+</div>
+
+<!-- STANDALONE: REVIEWS PAGE -->
+
+<div id="page-reviews" class="page">
+  <div style="max-width:900px;margin:0 auto;padding:2rem 1.5rem 3rem;">
+    <div class="section-label">Customer Reviews</div>
+    <h2>What people are saying.</h2>
+    <p class="section-sub" style="margin-bottom:2rem;">Real feedback from real customers in your area.</p>
+    <div class="reviews-grid" id="reviewsGrid2"></div>
+    <div style="text-align:center;margin-top:2rem;">
+      <button class="leave-review-btn" onclick="openReviewModal()">⭐ Leave a Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- STANDALONE: FAQ PAGE -->
+
+<div id="page-faq" class="page">
+  <div class="faq-page">
+    <div class="section-label">FAQs</div>
+    <h2>Frequently Asked Questions</h2>
+    <p class="section-sub" style="margin-bottom:2rem;">Everything you need to know. Can't find your answer? <a href="#" onclick="showPage('page-booking');return false;" style="color:var(--accent);font-weight:700;">Book a call</a> and ask me directly.</p>
+    <div class="faq-category">
+      <div class="faq-category-title">About the Service</div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is there a contract? <span class="faq-chevron">▾</span></button><div class="faq-answer">There is no contract — Brightspeed operates on a month-to-month basis so you're never locked in. You will need to keep your service active for 3 billing cycles to receive your gift card.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Will my price change after the first year? <span class="faq-chevron">▾</span></button><div class="faq-answer">I can't guarantee that prices won't change, but Brightspeed has not changed their rates in over two years. You also benefit from a 1-year price lock guarantee when you sign up.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What happens if I have a problem after installation? <span class="faq-chevron">▾</span></button><div class="faq-answer">You can call me directly and I'll do my best to resolve the issue. If needed, I'll set up a three-way call with Brightspeed so we speak to them together — you won't be left dealing with it alone.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How long does installation take? <span class="faq-chevron">▾</span></button><div class="faq-answer">Installation takes a maximum of 2 hours but on average is completed in around 45 minutes.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Do I need to be home for the installation? <span class="faq-chevron">▾</span></button><div class="faq-answer">You don't need to be home yourself, but someone aged 18 or over must be present at the property for the duration of the installation.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Will the engineer drill holes in my home? <span class="faq-chevron">▾</span></button><div class="faq-answer">In most cases the engineer will drill a small hole to pass the fiber cable through. Where an existing entry point is available they'll use that instead. Any hole drilled or reused will be fully sealed on completion.</div></div>
+    </div>
+    <div class="faq-category">
+      <div class="faq-category-title">Signing Up Through Brian</div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is it more expensive to sign up through you? <span class="faq-chevron">▾</span></button><div class="faq-answer">Not at all — there is no extra cost. The price you pay is exactly the same as going direct to Brightspeed.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Why should I sign up through you instead of Brightspeed directly? <span class="faq-chevron">▾</span></button><div class="faq-answer">By signing up through me you'll receive an extra $100 gift card plus free installation. You also get a real person to guide you through the process who is available to you even after you're set up.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Am I signing up on the call? <span class="faq-chevron">▾</span></button><div class="faq-answer">Not unless you want to. The call is simply a friendly chat to talk through your options. If you'd like to go ahead we can, but there's no pressure to decide on the spot.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is there any obligation when I book a call? <span class="faq-chevron">▾</span></button><div class="faq-answer">None whatsoever. If you book and don't answer, I may follow up with a single text — but that's as far as it goes. No pressure, no obligation.</div></div>
+    </div>
+    <div class="faq-category">
+      <div class="faq-category-title">About the Plans</div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What's the difference between fiber and my current internet? <span class="faq-chevron">▾</span></button><div class="faq-answer">If you're on coaxial or DSL, fiber is a major upgrade — faster speeds, equal upload and download, lower latency, and much more reliable. If you're already on fiber, we'll compare plans on pricing and speeds and see if I can get you a better deal.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What speed do I actually need? <span class="faq-chevron">▾</span></button><div class="faq-answer">That's exactly what our call is for. I'll ask a few simple questions about your household and make sure you're on the right plan — not just the most expensive one.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can I upgrade or downgrade my plan later? <span class="faq-chevron">▾</span></button><div class="faq-answer">Yes — you can change your plan at any time through the Brightspeed app. No fees involved.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Do I get to keep the router? <span class="faq-chevron">▾</span></button><div class="faq-answer">Yes. The router is yours to keep — there is no equipment rental fee.</div></div>
+    </div>
+    <div class="faq-category">
+      <div class="faq-category-title">About Switching</div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Will I lose internet during the switch? <span class="faq-chevron">▾</span></button><div class="faq-answer">No — your existing service stays active right up until the Brightspeed installation is complete.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can I keep my current email address? <span class="faq-chevron">▾</span></button><div class="faq-answer">Yes. Switching providers does not affect personal email accounts like Gmail, Outlook, or Yahoo.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Do I need to cancel my current provider myself? <span class="faq-chevron">▾</span></button><div class="faq-answer">Yes — you'll need to contact your current provider to cancel. I can advise you on the best time to cancel to avoid any overlap or gap in service.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How long does the whole process take? <span class="faq-chevron">▾</span></button><div class="faq-answer">Sign-up takes around 10 minutes over the phone. Installs can often be scheduled within a few days. The installation itself takes an average of 45 minutes. Very quick from start to finish.</div></div>
+    </div>
+    <div style="text-align:center;margin-top:2rem;padding:1.5rem;background:var(--accent-light);border-radius:16px;">
+      <p style="font-size:0.92rem;font-weight:700;color:var(--accent-dark);margin-bottom:0.6rem;">Still have a question?</p>
+      <a href="#" onclick="showPage('page-booking');return false;" class="btn-primary" style="font-size:0.9rem;">Book a Free Call →</a>
+    </div>
+  </div>
+</div>
+
+<div id="page-home" class="page active">
+
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Your<span>FiberRep</span></div>
+  <ul class="nav-links">
+    <li><a href="#plans">Plans</a></li>
+    <li><a href="#checker">Check Address</a></li>
+    <li><a href="#booking">Book a Call</a></li>
+  </ul>
+  <a href="#booking" class="nav-cta">Book Your Call</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-blob"></div>
+  <div class="hero-blob2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Brightspeed Authorised Local Rep</div>
+    <h1>Fast Internet,<br><strong>Real Support.</strong><br>From Someone Local.</h1>
+    <p class="hero-sub">Skip the hold music. I'm your local Brightspeed representative — here to walk you through the best plan for your home and get you connected, hassle free.</p>
+    <div class="hero-actions">
+      <a href="#booking" class="btn-primary">Book a Free Call →</a>
+      <a href="#plans" class="btn-ghost">View Plans</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">5★</div>
+        <div class="stat-label">Local service</div>
+      </div>
+      <div>
+        <div class="stat-num">24hr</div>
+        <div class="stat-label">Response time</div>
+      </div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Free consultation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- WHY BOOK THROUGH ME VS DIRECT -->
+<section class="fade-up why-direct">
+  <div class="why-direct-inner">
+    <div class="why-direct-icon">🤝</div>
+    <div>
+      <div class="section-label">Why Book Through Me?</div>
+      <h2>Same price. Better experience.</h2>
+      <p>Signing up through me costs you <strong>exactly the same as going direct</strong> — not a penny more. The difference is that when you call Brightspeed's customer line, you're speaking to someone following a script who doesn't know your area. When you speak to me, I'll take the time to understand exactly how you use your internet and match you to the right plan — <strong>no guesswork, no upselling, just honest advice from someone local.</strong></p>
+    </div>
+  </div>
+</section>
+
+
+<!-- PERSONAL INTRO -->
+<section class="fade-up intro">
+  <div class="intro-inner">
+    <img src="data:image/jpeg;base64,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" alt="Brian" class="intro-photo">
+    <div class="intro-text">
+      <h3>Hi, I'm Brian — your local Brightspeed rep.</h3>
+      <p>I've spent a lot of time knocking on doors to help people in this area get connected, and while I love meeting people face to face, I wanted to make things easier.</p>
+      <div id="introMore" style="display:none;">
+        <p style="margin-top:0.6rem;">This website means you can browse plans, check your address, and book a call with me in your own time — no one showing up at your door unannounced.</p>
+        <p style="margin-top:0.6rem;">When you book through here, you're not getting a random call centre agent. You're getting me — someone who knows this area, knows the plans inside out, and genuinely wants to find the right fit for your home. I'll do all the hard work on the call so you don't have to.</p>
+        <div class="intro-sig">— Brian</div>
+      </div>
+      <button onclick="toggleIntro()" id="introToggleBtn" style="background:none; border:none; color:var(--accent); font-family:'Nunito',sans-serif; font-weight:800; font-size:0.82rem; cursor:pointer; padding:0.4rem 0 0; display:flex; align-items:center; gap:0.3rem;">
+        <span id="introToggleLabel">Read more ▾</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- WHY ME -->
+<section class="fade-up why" style="padding:1.5rem 4rem;">
+  <div class="section-label">Why Book With Me</div>
+  <h2>More than just a phone line.</h2>
+  <p class="section-sub">You're not calling a call centre. You're speaking to a real person in your area who knows Brightspeed inside out.</p>
+  <ul class="why-list">
+    <li class="why-list-item">
+      <div class="why-list-title"><span>🎯</span> Personalised Plans</div>
+      <ul class="why-list-bullets">
+        <li>Matched to your home &amp; usage</li>
+        <li>Not the most expensive option</li>
+        <li>No guesswork, no upselling</li>
+      </ul>
+    </li>
+    <li class="why-list-item">
+      <div class="why-list-title"><span>📞</span> Real Answers</div>
+      <ul class="why-list-bullets">
+        <li>Ask anything, get a straight answer</li>
+        <li>No jargon, no scripts</li>
+        <li>Honest advice every time</li>
+      </ul>
+    </li>
+    <li class="why-list-item">
+      <div class="why-list-title"><span>⚡</span> Fast &amp; Easy Setup</div>
+      <ul class="why-list-bullets">
+        <li>Full sign-up handled on the call</li>
+        <li>No jumping through hoops online</li>
+        <li>Done in one conversation</li>
+      </ul>
+    </li>
+    <li class="why-list-item">
+      <div class="why-list-title"><span>📍</span> Local Knowledge</div>
+      <ul class="why-list-bullets">
+        <li>I know your area &amp; availability</li>
+        <li>Realistic speed expectations</li>
+        <li>Someone you can actually reach</li>
+      </ul>
+    </li>
+    <li class="why-list-item">
+      <div class="why-list-title"><span>🤝</span> Ongoing Support</div>
+      <ul class="why-list-bullets">
+        <li>I don't disappear after install</li>
+        <li>Got an issue? Call me directly</li>
+        <li>No hold music, no being passed around</li>
+        <li>Your local rep for the life of your plan</li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<!-- PLANS -->
+<section id="plans" class="plans fade-up" style="padding:3rem 4rem;">
+  <div class="section-label">Brightspeed Fiber Plans</div>
+  <h2>Choose your speed.</h2>
+  <p class="section-sub">All plans include equal upload &amp; download speeds, a WiFi 7 router, free installation, no contract, and a 1-year price lock guarantee. Check your address below to unlock exact pricing and gift card offers for your area.</p>
+  <div class="plans-grid">
+
+    <div class="plan-card">
+      <div class="plan-speed">200<span> Mbps</span></div>
+      <div class="plan-name">Basic Plan — Fiber</div>
+      <div class="plan-price-hidden">📍 Check address for pricing</div>
+      <div class="plan-price-tag">$29.99<span>/mo</span></div>
+      <div class="plan-gift no-gift">No gift card on this plan</div>
+      <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+      <ul class="plan-features">
+        <li>200 Mbps Download &amp; Upload</li>
+        <li>Best for small households</li>
+        <li>Everyday browsing &amp; streaming</li>
+        <li>WiFi 6 Router Included</li>
+        <li>No Contract</li>
+        <li>No Payment for 21 Days</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" onclick="selectPlan('Basic Plan – 200 Mbps Fiber')">Select This Plan</button>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-speed">500<span> Mbps</span></div>
+      <div class="plan-name">Mid-Tier Plan — Fiber</div>
+      <div class="plan-price-hidden">📍 Check address for pricing</div>
+      <div class="plan-price-tag">$39.99<span>/mo</span></div>
+      <div class="plan-gift">🎁 $150 Visa Gift Card</div>
+      <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+      <ul class="plan-features">
+        <li>500 Mbps Download &amp; Upload</li>
+        <li>Best for families</li>
+        <li>Streaming &amp; working from home</li>
+        <li>Multiple devices at once</li>
+        <li>WiFi 6 Router Included</li>
+        <li>No Contract</li>
+        <li>No Payment for 21 Days</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" onclick="selectPlan('Mid-Tier Plan – 500 Mbps Fiber')">Select This Plan</button>
+    </div>
+
+    <div class="plan-card popular">
+      <div class="popular-tag">Most Popular</div>
+      <div class="plan-speed">1<span> Gig</span></div>
+      <div class="plan-name">High-Speed Plan — Fiber</div>
+      <div class="plan-price-hidden">📍 Check address for pricing</div>
+      <div class="plan-price-tag">$39.99<span>/mo</span></div>
+      <div class="plan-gift">🎁 $200 Visa Gift Card</div>
+      <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+      <ul class="plan-features">
+        <li>1000 Mbps Download &amp; Upload</li>
+        <li>Heavy streaming &amp; gaming</li>
+        <li>Smart homes &amp; multiple devices</li>
+        <li>WiFi 7 Router Included</li>
+        <li>No Contract</li>
+        <li>No Payment for 21 Days</li>
+      </ul>
+      <button class="plan-btn plan-btn-filled" onclick="selectPlan('High-Speed Plan – 1 Gig Fiber')">Select This Plan</button>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-speed">2<span> Gig</span></div>
+      <div class="plan-name">Ultra-Fast Plan — Fiber</div>
+      <div class="plan-price-hidden">📍 Check address for pricing</div>
+      <div class="plan-price-tag">$49.99<span>/mo</span></div>
+      <div class="plan-gift">🎁 $300 Visa Gift Card</div>
+      <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+      <ul class="plan-features">
+        <li>2000 Mbps Download &amp; Upload</li>
+        <li>Power users &amp; large households</li>
+        <li>Maximum performance</li>
+        <li>4K streaming, gaming &amp; more</li>
+        <li>WiFi 7 Router Included</li>
+        <li>No Contract</li>
+        <li>No Payment for 21 Days</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" onclick="selectPlan('Ultra-Fast Plan – 2 Gig Fiber')">Select This Plan</button>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-speed">5<span> Gig</span></div>
+      <div class="plan-name">Hyper-Fast Plan — Fiber</div>
+      <div class="plan-price-hidden">📍 Check address for pricing</div>
+      <div class="plan-price-tag">$79.99<span>/mo</span></div>
+      <div class="plan-gift">🎁 $300 Visa Gift Card</div>
+      <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+      <div class="plan-limited">⚠️ Available at select addresses only</div>
+      <ul class="plan-features">
+        <li>5000 Mbps Download &amp; Upload</li>
+        <li>Power users &amp; large households</li>
+        <li>Maximum performance</li>
+        <li>4K streaming, gaming &amp; more</li>
+        <li>WiFi 7 Router Included</li>
+        <li>No Contract</li>
+        <li>No Payment for 21 Days</li>
+        <li>1-Year Price Lock Guarantee</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" onclick="selectPlan('Hyper-Fast Plan – 5 Gig Fiber')">Select This Plan</button>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-speed">8<span> Gig</span></div>
+      <div class="plan-name">Ultimate Plan — Fiber</div>
+      <div class="plan-price-hidden">📍 Check address for pricing</div>
+      <div class="plan-price-tag">$109.99<span>/mo</span></div>
+      <div class="plan-gift">🎁 $300 Visa Gift Card</div>
+      <div class="plan-brian-bonus">⭐ Book through Brian: <strong>+$100 gift card &amp; free install</strong></div>
+      <div class="plan-limited">⚠️ Available at select addresses only</div>
+      <ul class="plan-features">
+        <li>8000 Mbps Download &amp; Upload</li>
+        <li>Power users &amp; large households</li>
+        <li>Maximum performance</li>
+        <li>4K streaming, gaming &amp; more</li>
+        <li>WiFi 7 Router Included</li>
+        <li>No Contract</li>
+        <li>No Payment for 21 Days</li>
+        <li>1-Year Price Lock Guarantee</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" onclick="selectPlan('Ultimate Plan – 8 Gig Fiber')">Select This Plan</button>
+    </div>
+
+  </div>
+  <p style="margin-top:1.6rem; font-size:0.85rem; color:var(--accent-dark); text-align:center; font-weight:700;">👇 Enter your address below to unlock exact pricing &amp; gift card offers for your area</p>
+
+  <div class="benefits-strip">
+    <div class="benefit-item">📅 <span>No Payment for 21 Days</span></div>
+    <div class="benefit-item">🔧 <span>Free Installation</span></div>
+    <div class="benefit-item">📄 <span>No Contract</span></div>
+    <div class="benefit-item">📶 <span>WiFi 7 Router Included</span></div>
+    <div class="benefit-item">💰 <span>No Equipment Rental</span></div>
+    <div class="benefit-item">🎁 <span>Signup Bonus — Up to $300</span></div>
+    <div class="benefit-item">🔒 <span>1-Year Price Lock</span></div>
+    <div class="benefit-item">⚡ <span>Equal Upload &amp; Download</span></div>
+  </div>
+</section>
+
+<!-- ADDRESS CHECKER -->
+<section id="checker" class="checker fade-up">
+  <div class="section-label">Availability &amp; Pricing</div>
+  <h2>Check your address.</h2>
+  <p class="section-sub">Enter your address or zip code to see exact plan pricing and any gift card promotions available in your area.</p>
+  <div class="checker-inner">
+    <h3>What's available at your address?</h3>
+    <p>Enter your full address including zip code to unlock pricing and promotions for your area.</p>
+    <div class="input-row">
+      <input type="text" class="input-field" id="addressInput" placeholder="e.g. 123 Main St, Charlotte, NC 28201">
+      <button class="check-btn" onclick="checkAddress()">Check</button>
+    </div>
+    <div class="checker-result" id="checkerResult"></div>
+    <div id="planPricing" style="display:none; margin-top:1.5rem;"></div>
+  </div>
+</section>
+
+
+
+
+
+<!-- BOOKING FORM -->
+<section id="booking" class="booking fade-up">
+  <div class="booking-inner">
+    <div class="section-label">Book a Call</div>
+    <h2>Let's get you connected.</h2>
+    <p class="section-sub">Fill in your details and I'll give you a call to get everything sorted — fast, easy, and on your terms.</p>
+    <div class="form-card">
+      <p style="font-size:0.85rem; color:var(--accent-dark); font-weight:700; margin-bottom:1.4rem; background:var(--accent-light); padding:0.8rem 1.1rem; border-radius:10px;">💡 The more you fill in, the more prepared I'll be for our call — but all we need to get started is your name and number!</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">First Name <span style="color:#c05050;">*</span></label>
+          <input type="text" class="form-input" id="firstName" placeholder="John">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name <span style="color:var(--muted); font-weight:500;">(optional)</span></label>
+          <input type="text" class="form-input" id="lastName" placeholder="Smith">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number <span style="color:#c05050;">*</span></label>
+          <input type="tel" class="form-input" id="phone" placeholder="(347) 244-8760">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address <span style="color:var(--muted); font-weight:500;">(optional)</span></label>
+          <input type="email" class="form-input" id="email" placeholder="john@example.com">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Home Address <span style="color:var(--muted); font-weight:500;">(optional)</span></label>
+          <input type="text" class="form-input" id="formAddress" placeholder="123 Main St, Charlotte, NC 28201">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Preferred Plan <span style="color:var(--muted); font-weight:500;">(optional)</span></label>
+          <select class="form-input" id="plan">
+            <option value="">— Select a plan —</option>
+            <option>Basic Plan – 200 Mbps ($29.99/mo)</option>
+            <option>Mid-Tier Plan – 500 Mbps ($39.99/mo)</option>
+            <option>High-Speed Plan – 1 Gig ($39.99/mo)</option>
+            <option>Ultra-Fast Plan – 2 Gig ($49.99/mo)</option>
+            <option>Hyper-Fast Plan – 5 Gig ($79.99/mo)</option>
+            <option>Ultimate Plan – 8 Gig ($109.99/mo)</option>
+            <option>Not sure – help me choose</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Anything else? <span style="color:var(--muted); font-weight:500;">(optional)</span></label>
+          <input type="text" class="form-input" id="notes" placeholder="e.g. Best time to call, current provider...">
+        </div>
+      </div>
+      <div class="form-group full" id="calendarInForm" style="margin-top:0.5rem;">
+          <label class="form-label">Preferred Call Time <span style="color:#c05050;">*</span></label>
+          <div style="background:var(--bg); border:1.5px solid var(--border); border-radius:14px; padding:1.2rem; margin-top:0.3rem;" id="inFormCalWrap">
+            <div class="cal-step-label" style="margin-bottom:0.6rem;">Pick a Day</div>
+            <div class="day-grid" id="dayGrid"></div>
+            <div id="timeStepInForm" style="display:none; margin-top:1.2rem;">
+              <div class="cal-step-label" style="margin-bottom:0.4rem;">Pick a Time Slot</div>
+              <p class="tz-note">📍 All times in Miami time (ET)</p>
+              <div class="time-grid" id="timeGrid"></div>
+              <div class="cal-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--accent);"></div> Available</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ccc;"></div> Already Booked</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#f0c0c0;"></div> Unavailable</div>
+              </div>
+            </div>
+            <div id="calConfirmStep" style="display:none; margin-top:1rem; padding:1rem; background:var(--accent-light); border-radius:10px; border:1.5px solid rgba(74,144,164,0.25);">
+              <p style="font-size:0.88rem; font-weight:700; color:var(--accent-dark);">✓ Selected: <span id="calSelectedTime"></span></p>
+            </div>
+          </div>
+          <input type="hidden" id="selectedSlot" value="">
+        </div>
+        <button class="submit-btn" onclick="submitForm()">Book My Call →</button>
+      <p class="form-note">🔒 Your details are only shared with your local rep. No spam, ever.</p>
+      <div style="margin-top:1.2rem; padding:1rem 1.2rem; background:var(--bg); border-radius:12px; border:1.5px solid var(--border); text-align:center;">
+        <p style="font-size:0.88rem; color:var(--muted); font-weight:600; line-height:1.7;">Prefer to skip the form? Give me a call directly on <a href="tel:+13472448760" style="color:var(--accent-dark); font-weight:800; text-decoration:none;">(347) 244-8760</a><br>If I don't answer right away, I'll be sure to call you back at the earliest convenience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- REVIEWS -->
+<section class="fade-up reviews-section" id="reviews">
+  <div class="section-label">Customer Reviews</div>
+  <h2>What people are saying.</h2>
+  <p class="section-sub">Real feedback from real customers in your area.</p>
+  <div class="reviews-grid" id="reviewsGrid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Brian made the whole process so easy. I'd been putting off switching for months but he explained everything clearly and had me set up in no time. Couldn't recommend more!"</div>
+      <div class="review-author">Sarah M.</div>
+      <div class="review-location">Charlotte, NC</div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"I called Brightspeed directly first and got passed around for 45 minutes. Called Brian and he sorted everything in one conversation. Night and day difference."</div>
+      <div class="review-author">James T.</div>
+      <div class="review-location">Local customer</div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Genuinely the easiest sign up I've ever done for any utility. Brian knew exactly what plan suited our family and there was zero pressure. Great service."</div>
+      <div class="review-author">Maria &amp; Dan K.</div>
+      <div class="review-location">Local customers</div>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <button class="leave-review-btn" onclick="openReviewModal()">⭐ Leave a Review</button>
+  </div>
+</section>
+
+<!-- Review Modal -->
+<div class="review-modal-overlay" id="reviewModal">
+  <div class="review-modal">
+    <h3>Leave a Review</h3>
+    <p>Had a great experience? I'd really appreciate you sharing it — it helps others in the area feel confident booking a call.</p>
+    <div class="cal-step-label">Your Rating</div>
+    <div class="star-selector" id="starSelector">
+      <span onclick="setRating(1)" data-val="1">★</span>
+      <span onclick="setRating(2)" data-val="2">★</span>
+      <span onclick="setRating(3)" data-val="3">★</span>
+      <span onclick="setRating(4)" data-val="4">★</span>
+      <span onclick="setRating(5)" data-val="5">★</span>
+    </div>
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label class="form-label">Your Name</label>
+      <input type="text" class="form-input" id="reviewName" placeholder="e.g. Sarah M.">
+    </div>
+    <div class="form-group" style="margin-bottom:0.5rem;">
+      <label class="form-label">Your Review</label>
+      <textarea class="form-input" id="reviewText" rows="3" maxlength="300" placeholder="Tell others about your experience (max 300 characters)..." style="resize:vertical; font-family:'Nunito',sans-serif;" oninput="updateCharCount()"></textarea>
+    <div id="charCount" style="font-size:0.75rem; color:var(--muted); text-align:right; margin-top:0.3rem; font-weight:600;">0 / 300</div>
+    </div>
+    <button class="review-submit-btn" onclick="submitReview()">Submit Review</button>
+    <button class="review-cancel-btn" onclick="closeReviewModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- PRIVACY BAR -->
+<div class="privacy-bar">
+  🔒 Your privacy matters. Any information you share with us is used solely to arrange your call with Brian and will never be shared with or sold to any third party. By submitting your details you agree to being contacted by your local Brightspeed representative only.
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Your<span>FiberRep</span></div>
+  <p>Your local Brightspeed representative.<br>Real people, real support, right in your area.</p>
+  <p style="margin-top:0.8rem; font-size:0.88rem; font-weight:700; color:var(--accent-dark);">📞 <a href="tel:+13472448760" style="color:var(--accent-dark); text-decoration:none;">(347) 244-8760</a></p>
+  <p style="font-size:0.8rem; color:var(--muted); font-weight:500; margin-top:0.3rem;">If I don't answer right away, I'll be sure to call you back at the earliest convenience.</p>
+  <p class="footer-disclaimer">This is an independent sales representative website. YourFiberRep is not the official Brightspeed website. All plans and pricing are subject to address eligibility and may vary.</p>
+</footer>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon">✓</div>
+    <h3>You're all booked in!</h3>
+    <p>Thanks so much! I'll call you at your chosen time to go through your options. It's just a friendly chat — no commitment needed. Talk soon!</p>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+</div>
+
+
+</div><!-- end page-home -->
+
+</div><!-- end page-wrapper -->
+
+<!-- ═══ GLOBAL ELEMENTS ═══ -->
+
+<!-- Review Modal -->
+<div class="review-modal-overlay" id="reviewModal">
+  <div class="review-modal">
+    <h3>Leave a Review</h3>
+    <p>Had a great experience? I'd really appreciate you sharing it — it helps others in the area feel confident booking a call.</p>
+    <div class="cal-step-label">Your Rating</div>
+    <div class="star-selector" id="starSelector">
+      <span onclick="setRating(1)" data-val="1">★</span>
+      <span onclick="setRating(2)" data-val="2">★</span>
+      <span onclick="setRating(3)" data-val="3">★</span>
+      <span onclick="setRating(4)" data-val="4">★</span>
+      <span onclick="setRating(5)" data-val="5">★</span>
+    </div>
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label class="form-label">Your Name</label>
+      <input type="text" class="form-input" id="reviewName" placeholder="e.g. Sarah M.">
+    </div>
+    <div class="form-group" style="margin-bottom:0.5rem;">
+      <label class="form-label">Your Review</label>
+      <textarea class="form-input" id="reviewText" rows="3" maxlength="300" placeholder="Tell others about your experience (max 300 characters)..." style="resize:vertical; font-family:'Nunito',sans-serif;" oninput="updateCharCount()"></textarea>
+    <div id="charCount" style="font-size:0.75rem; color:var(--muted); text-align:right; margin-top:0.3rem; font-weight:600;">0 / 300</div>
+    </div>
+    <button class="review-submit-btn" onclick="submitReview()">Submit Review</button>
+    <button class="review-cancel-btn" onclick="closeReviewModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- PRIVACY BAR -->
+<div class="privacy-bar">
+  🔒 Your privacy matters. Any information you share with us is used solely to arrange your call with Brian and will never be shared with or sold to any third party. By submitting your details you agree to being contacted by your local Brightspeed representative only.
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Your<span>FiberRep</span></div>
+  <p>Your local Brightspeed repre
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon">✓</div>
+    <h3>You're all booked in!</h3>
+    <p>Thanks so much! I'll call you at your chosen time to go through your options. It's just a friendly chat — no commitment needed. Talk soon!</p>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+
+<!-- TEXT ME WIDGET -->
+<div class="text-widget" id="textWidget">
+  <div class="text-bubble" id="textBubble" style="display:none;">
+    <button onclick="closeTextWidget()" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:1.5px solid #dde5d8;background:#fff;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7a6b;font-family:sans-serif;line-height:1;padding:0;">✕</button>
+    <p>💬 <span>Prefer to text?</span><br>Send me a message directly and I'll get back to you as soon as I can!</p>
+    <a class="text-bubble-btn" href="sms:+13472448760&body=Hi%20Brian%2C%20I%20saw%20your%20website%20and%20I%27d%20like%20to%20find%20out%20more%20about%20Brightspeed!" id="textMeLink">
+      💬 Text Me Now
+    </a>
+  </div>
+  <button class="text-fab" id="textFab" onclick="toggleTextWidget()" aria-label="Text Brian">
+    💬
+  </button>
+</div>
+
+<!-- TEXT ME WIDGET -->
+<div class="text-widget" id="textWidget">
+  <div class="text-bubble" id="textBubble" style="display:none;">
+    <button onclick="closeTextWidget()" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:1.5px solid #dde5d8;background:#fff;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7a6b;font-family:sans-serif;line-height:1;padding:0;">✕</button>
+    <p>💬 <span>Prefer to text?</span><br>Send me a message directly and I'll get back to you as soon as I can!</p>
+    <a class="text-bubble-btn" href="sms:+13472448760&body=Hi%20Brian%2C%20I%20saw%20your%20website%20and%20I%27d%20like%20to%20find%20out%20more%20about%20Brightspeed!" id="textMeLink">
+      💬 Text Me Now
+    </a>
+  </div>
+  <button class="text-fab" id="textFab" onclick="toggleTextWidget()" aria-label="Text Brian">
+    💬
+  </button>
+</div>
+
+<script>
+  // ── SIDEBAR & NAVIGATION ──
+  document.body.classList.add('has-sidebar');
+
+  function showPage(id) {
+    var pageId = id.replace('page-', '');
+    // Hide ALL pages using multiple methods for maximum compatibility
+    var allPages = document.querySelectorAll('.page');
+    for (var i = 0; i < allPages.length; i++) {
+      allPages[i].setAttribute('style', 'display:none!important');
+      allPages[i].classList.remove('active');
+    }
+    // Remove active nav
+    var allNav = document.querySelectorAll('.sidebar-nav a');
+    for (var j = 0; j < allNav.length; j++) {
+      allNav[j].classList.remove('active');
+    }
+    // Show target page
+    var page = document.getElementById('page-' + pageId);
+    if (page) {
+      page.setAttribute('style', 'display:block!important');
+      page.classList.add('active');
+    }
+    // Active nav
+    var navEl = document.getElementById('nav-' + pageId);
+    if (navEl) navEl.classList.add('active');
+    // Scroll top
+    window.scrollTo(0, 0);
+    document.querySelector('.page-wrapper') && (document.querySelector('.page-wrapper').scrollTop = 0);
+    // Mobile: close sidebar
+    if (window.innerWidth < 900) closeSidebar();
+    // Booking: init calendar
+    if (pageId === 'booking') {
+      setTimeout(function() {
+        buildDayGrid('dayGrid2', 'timeStepInForm2', 'timeGrid2', 'calConfirmStep2', 'calSelectedTime2', 'selectedSlot2');
+      }, 100);
+    }
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+  }
+
+  function goToSection(pageId, sectionId) {
+    showPage(pageId);
+    setTimeout(() => {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
+  // ── BANNER ──
+  function closeBanner() {
+    const banner = document.getElementById('promoBanner');
+    if (banner) banner.style.display = 'none';
+    document.body.classList.remove('banner-visible');
+  }
+
+  // ── TEXT WIDGET ──
+  let widgetDismissed = false;
+
+  function toggleTextWidget() {
+    const bubble = document.getElementById('textBubble');
+    if (!bubble) return;
+    const isHidden = bubble.style.display === 'none' || bubble.style.display === '';
+    bubble.style.display = isHidden ? 'block' : 'none';
+  }
+
+  function closeTextWidget() {
+    const bubble = document.getElementById('textBubble');
+    if (bubble) bubble.style.display = 'none';
+    widgetDismissed = true;
+  }
+
+  // Auto-show text bubble after 4 seconds
+  setTimeout(function() {
+    var bubble = document.getElementById('textBubble');
+    if (bubble && !widgetDismissed) bubble.style.display = 'block';
+  }, 4000);
+
+  // ── ADDRESS DATA ──
+  const eligibleAddresses = [
+    { match: ["32812", "sorrento"], zip: "44012", city: "Avon Lake" },
+    { match: ["32821", "webber"], zip: "44012", city: "Avon Lake" },
+    { match: ["32956", "webber"], zip: "44012", city: "Avon Lake" },
+    { match: ["654", "avon belden"], zip: "44012", city: "Avon Lake" },
+    { match: ["591", "deer run"], zip: "44012", city: "Avon Lake" },
+    { match: ["32807", "webber"], zip: "44012", city: "Avon Lake" },
+    { match: ["32811", "sorrento"], zip: "44012", city: "Avon Lake" },
+    { match: ["32854", "rebecca"], zip: "44012", city: "Avon Lake" },
+    { match: ["32815", "rebecca"], zip: "44012", city: "Avon Lake" },
+    { match: ["32780", "webber"], zip: "44012", city: "Avon Lake" },
+    { match: ["32908", "webber"], zip: "44012", city: "Avon Lake" },
+    { match: ["32930", "fox chappel"], zip: "44012", city: "Avon Lake" },
+    { match: ["2425", "norton"], zip: "44011", city: "Avon" },
+    { match: ["1611", "center"], zip: "44011", city: "Avon" },
+  ];
+
+  const standardPlans = [
+    { name: "Basic Plan", speed: "200 Mbps Fiber", price: "$29.99/mo", gift: null },
+    { name: "Mid-Tier Plan", speed: "500 Mbps Fiber", price: "$39.99/mo", gift: "$150 Visa Gift Card" },
+    { name: "High-Speed Plan", speed: "1 Gig Fiber", price: "$39.99/mo", gift: "$200 Visa Gift Card" },
+    { name: "Ultra-Fast Plan", speed: "2 Gig Fiber", price: "$49.99/mo", gift: "$300 Visa Gift Card" },
+    { name: "Hyper-Fast Plan", speed: "5 Gig Fiber - subject to address availability", price: "$79.99/mo", gift: "$300 Visa Gift Card" },
+    { name: "Ultimate Plan", speed: "8 Gig Fiber - subject to address availability", price: "$109.99/mo", gift: "$300 Visa Gift Card" }
+  ];
+
+  function findAddress(input) {
+    const lower = input.toLowerCase();
+    return eligibleAddresses.find(a =>
+      a.match.every(fragment => lower.includes(fragment.toLowerCase()))
+    );
+  }
+
+  // ── ADDRESS CHECKER ──
+  function buildPricingHTML(data, selectFn) {
+    let html = '<div class="pricing-reveal">';
+    data.plans.forEach(p => {
+      html += `<div class="price-card">
+        <div class="price-card-left">
+          <div class="price-card-name">${p.name}</div>
+          <div class="price-card-speed">${p.speed}</div>
+        </div>
+        <div class="price-card-right">
+          <div class="price-amount">${p.price} <span>with autopay & paperless billing</span></div>
+          ${p.gift ? `<div class="gift-tag">🎁 ${p.gift}</div>` : ''}
+          <button class="price-select-btn" onclick="${selectFn}('${p.name} – ${p.speed} (${p.price})')">Select →</button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function checkAddress() {
+    const input = document.getElementById('addressInput').value.trim();
+    const result = document.getElementById('checkerResult');
+    const pricing = document.getElementById('planPricing');
+    if (!input) return;
+    const found = findAddress(input);
+    result.style.display = 'block';
+    if (found) {
+      result.className = 'checker-result result-available';
+      result.innerHTML = `✓ Great news! Brightspeed Fiber is available at your address in ${found.city}, OH ${found.zip}. Here are your plan options:`;
+      const formAddr = document.getElementById('formAddress');
+      if (formAddr) formAddr.value = input;
+      pricing.innerHTML = buildPricingHTML({ plans: standardPlans }, 'selectPlan');
+      pricing.style.display = 'block';
+    } else {
+      result.className = 'checker-result result-unavailable';
+      result.innerHTML = "✗ We couldn't automatically verify that address. Don't worry — fill in the booking form below and I'll check manually and give you a call back.";
+      pricing.style.display = 'none';
+    }
+  }
+
+  function checkAddress2() {
+    const input = document.getElementById('addressInput2').value.trim();
+    const result = document.getElementById('checkerResult2');
+    const pricing = document.getElementById('planPricing2');
+    if (!input) return;
+    const found = findAddress(input);
+    result.style.display = 'block';
+    if (found) {
+      result.className = 'checker-result result-available';
+      result.innerHTML = `✓ Great news! Brightspeed Fiber is available at your address in ${found.city}, OH ${found.zip}. Here are your plan options:`;
+      pricing.innerHTML = buildPricingHTML({ plans: standardPlans }, 'selectPlanAndBook');
+      pricing.style.display = 'block';
+    } else {
+      result.className = 'checker-result result-unavailable';
+      result.innerHTML = "✗ We couldn't automatically verify that address. Don't worry — book a call and I'll check manually and call you back.";
+      pricing.style.display = 'none';
+    }
+  }
+
+  function selectPlan(planName) {
+    const sel = document.getElementById('plan');
+    if (sel) {
+      let found = false;
+      for (let o of sel.options) { if (o.value === planName) { found = true; break; } }
+      if (!found) { const opt = document.createElement('option'); opt.value = planName; opt.text = planName; sel.appendChild(opt); }
+      sel.value = planName;
+    }
+    goToSection('page-home', 'booking');
+  }
+
+  function selectPlanAndBook(planName) {
+    showPage('page-booking');
+    setTimeout(() => {
+      const sel = document.getElementById('bPlan');
+      if (sel) sel.value = planName;
+    }, 100);
+  }
+
+  // ── BOOKING FORM ──
+  function submitForm() {
+    const firstName = document.getElementById('firstName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    if (!firstName || !phone) {
+      alert('Please enter your first name and phone number so I can give you a call!');
+      return;
+    }
+    const slot = document.getElementById('selectedSlot') ? document.getElementById('selectedSlot').value : '';
+    if (!slot) {
+      alert('Please pick a call time from the calendar so I know when to ring you!');
+      return;
+    }
+    console.log('New lead:', { firstName, phone, slot });
+    document.getElementById('successModal').classList.add('active');
+  }
+
+  function submitBookingForm() {
+    const firstName = document.getElementById('bFirstName').value.trim();
+    const phone = document.getElementById('bPhone').value.trim();
+    if (!firstName || !phone) {
+      alert('Please enter your first name and phone number so I can give you a call!');
+      return;
+    }
+    console.log('New lead from booking page:', { firstName, phone });
+    document.getElementById('successModal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('successModal').classList.remove('active');
+  }
+
+  // ── CALENDAR ──
+  const TZ = 'America/New_York';
+  const SLOT_MINUTES = 30;
+  const START_HOUR = 9;
+  const END_HOUR = 21;
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let bookedSlots = new Set();
+  let blockedSlots = new Set();
+
+  function getNowET() {
+    return new Date(new Date().toLocaleString('en-US', { timeZone: TZ }));
+  }
+
+  function formatDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function buildDayGrid(gridId, timeStepId, timeGridId, confirmId, selectedTimeId, hiddenId) {
+    const grid = document.getElementById(gridId);
+    if (!grid) { return; }
+    grid.innerHTML = '';
+    const now = getNowET();
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+      const key = formatDate(d);
+      const btn = document.createElement('button');
+      btn.className = 'day-btn';
+      btn.textContent = `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+      btn.onclick = () => {
+        grid.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        const confirmEl = document.getElementById(confirmId);
+        if (confirmEl) confirmEl.style.display = 'none';
+        const hiddenEl = document.getElementById(hiddenId);
+        if (hiddenEl) hiddenEl.value = '';
+        const timeStep = document.getElementById(timeStepId);
+        if (timeStep) timeStep.style.display = 'block';
+        buildTimeGrid(key, timeGridId, confirmId, selectedTimeId, hiddenId);
+      };
+      grid.appendChild(btn);
+    }
+  }
+
+  function buildTimeGrid(dayKey, gridId, confirmId, selectedTimeId, hiddenId) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    grid.innerHTML = '';
+    const now = getNowET();
+    const todayKey = formatDate(now);
+    for (let h = START_HOUR; h < END_HOUR; h++) {
+      for (let m = 0; m < 60; m += SLOT_MINUTES) {
+        const hh = h.toString().padStart(2,'0');
+        const mm = m.toString().padStart(2,'0');
+        const slotKey = `${dayKey}|${hh}:${mm}`;
+        const h12 = h > 12 ? h-12 : h === 0 ? 12 : h;
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const display = `${h12}:${mm} ${ampm}`;
+        const btn = document.createElement('button');
+        btn.className = 'time-btn';
+        btn.textContent = display;
+        const isPast = dayKey === todayKey && (h < now.getHours() || (h === now.getHours() && m <= now.getMinutes()));
+        if (bookedSlots.has(slotKey) || isPast) {
+          btn.classList.add('booked');
+        } else if (blockedSlots.has(slotKey)) {
+          btn.classList.add('blocked');
+        } else {
+          btn.onclick = () => {
+            grid.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            const dateStr = new Date(dayKey + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+            const selTimeEl = document.getElementById(selectedTimeId);
+            if (selTimeEl) selTimeEl.textContent = `${dateStr} at ${display} ET`;
+            const confirmEl = document.getElementById(confirmId);
+            if (confirmEl) confirmEl.style.display = 'block';
+            const hiddenEl = document.getElementById(hiddenId);
+            if (hiddenEl) hiddenEl.value = `${dayKey} at ${display} ET`;
+            bookedSlots.add(slotKey);
+          };
+        }
+        grid.appendChild(btn);
+      }
+    }
+  }
+
+  // ── REVIEWS ──
+  let currentRating = 0;
+  const sampleReviews = [
+    { stars: 5, text: "Brian made the whole process so easy. I'd been putting off switching for months but he explained everything clearly and had me set up in no time. Couldn't recommend more!", name: "Sarah M.", location: "Charlotte, NC" },
+    { stars: 5, text: "I called Brightspeed directly first and got passed around for 45 minutes. Called Brian and he sorted everything in one conversation. Night and day difference.", name: "James T.", location: "Local customer" },
+    { stars: 5, text: "Genuinely the easiest sign up I've ever done for any utility. Brian knew exactly what plan suited our family and there was zero pressure. Great service.", name: "Maria & Dan K.", location: "Local customers" }
+  ];
+  let allReviews = [...sampleReviews];
+
+  function renderReviews() {
+    const grid = document.getElementById('reviewsGrid');
+    if (!grid) return;
+    grid.innerHTML = allReviews.map(r => `
+      <div class="review-card">
+        <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+        <div class="review-text">"${r.text}"</div>
+        <div class="review-author">${r.name}</div>
+        <div class="review-location">${r.location}</div>
+      </div>`).join('');
+  }
+
+  function renderReviews2() {
+    const grid = document.getElementById('reviewsGrid2');
+    if (!grid) return;
+    grid.innerHTML = allReviews.map(r => `
+      <div class="review-card">
+        <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+        <div class="review-text">"${r.text}"</div>
+        <div class="review-author">${r.name}</div>
+        <div class="review-location">${r.location}</div>
+      </div>`).join('');
+  }
+
+  function openReviewModal() {
+    document.getElementById('reviewModal').classList.add('active');
+    currentRating = 0;
+    document.querySelectorAll('#starSelector span').forEach(s => s.classList.remove('selected'));
+    const rn = document.getElementById('reviewName'); if (rn) rn.value = '';
+    const rt = document.getElementById('reviewText'); if (rt) rt.value = '';
+    updateCharCount();
+  }
+
+  function closeReviewModal() {
+    document.getElementById('reviewModal').classList.remove('active');
+  }
+
+  function setRating(val) {
+    currentRating = val;
+    document.querySelectorAll('#starSelector span').forEach(s => {
+      s.classList.toggle('selected', parseInt(s.dataset.val) <= val);
+    });
+  }
+
+  function updateCharCount() {
+    const ta = document.getElementById('reviewText');
+    const count = document.getElementById('charCount');
+    if (ta && count) count.textContent = ta.value.length + ' / 300';
+  }
+
+  function submitReview() {
+    const name = document.getElementById('reviewName').value.trim();
+    const text = document.getElementById('reviewText').value.trim();
+    if (!currentRating) { alert('Please select a star rating.'); return; }
+    if (!name) { alert('Please enter your name.'); return; }
+    if (!text || text.length < 10) { alert('Please write a short review (at least 10 characters).'); return; }
+    allReviews.unshift({ stars: currentRating, text, name, location: 'Local customer' });
+    renderReviews();
+    renderReviews2();
+    closeReviewModal();
+    document.getElementById('successModal').classList.add('active');
+  }
+
+  // ── FAQ ──
+  function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const chevron = btn.querySelector('.faq-chevron');
+    const isOpen = answer.style.display === 'block';
+    document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
+    document.querySelectorAll('.faq-chevron').forEach(c => c.style.transform = 'rotate(0deg)');
+    if (!isOpen) {
+      answer.style.display = 'block';
+      if (chevron) chevron.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  // ── INTRO TOGGLE ──
+  function toggleIntro() {
+    const more = document.getElementById('introMore');
+    const label = document.getElementById('introToggleLabel');
+    if (!more) return;
+    const open = more.style.display === 'block';
+    more.style.display = open ? 'none' : 'block';
+    if (label) label.textContent = open ? 'Read more ▾' : 'Show less ▴';
+  }
+
+  function toggleWhyCard(card) {
+    const bullets = card.querySelector('.why-bullets');
+    const arrow = card.querySelector('.why-arrow');
+    if (!bullets) return;
+    const open = bullets.style.display === 'block';
+    bullets.style.display = open ? 'none' : 'block';
+    if (arrow) arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+
+  // ── INIT ──
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('banner-visible');
+    document.body.classList.add('has-sidebar');
+    // Hide all pages first, then show home
+    var allPages = document.querySelectorAll('.page');
+    for (var i = 0; i < allPages.length; i++) {
+      allPages[i].setAttribute('style', 'display:none!important');
+      allPages[i].classList.remove('active');
+    }
+    var homePage = document.getElementById('page-home');
+    if (homePage) {
+      homePage.setAttribute('style', 'display:block!important');
+      homePage.classList.add('active');
+    }
+    // Init calendar
+    buildDayGrid('dayGrid', 'timeStepInForm', 'timeGrid', 'calConfirmStep', 'calSelectedTime', 'selectedSlot');
+    renderReviews();
+    renderReviews2();
+  });
+
+
+  // ── SCROLL ANIMATIONS ──
+  function checkFadeEls() {
+    var els = document.querySelectorAll('#page-home .fade-up');
+    var windowHeight = window.innerHeight;
+    for (var i = 0; i < els.length; i++) {
+      var rect = els[i].getBoundingClientRect();
+      if (rect.top < windowHeight * 0.92) {
+        els[i].classList.add('visible');
+      }
+    }
+  }
+  window.addEventListener('scroll', checkFadeEls);
+  setTimeout(checkFadeEls, 300);
+
+  // Enter key on address inputs
+  const ai1 = document.getElementById('addressInput');
+  const ai2 = document.getElementById('addressInput2');
+  if (ai1) ai1.addEventListener('keydown', e => { if (e.key === 'Enter') checkAddress(); });
+  if (ai2) ai2.addEventListener('keydown', e => { if (e.key === 'Enter') checkAddress2(); });
+
+</script>
+
+</body>
