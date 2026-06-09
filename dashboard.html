@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YourFiberRep — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f7f2;
+  --white: #ffffff;
+  --accent: #3a6b4a;
+  --accent-light: #e8f2eb;
+  --accent-dark: #2a5238;
+  --warm: #c9973a;
+  --warm-light: #fdf6e8;
+  --red: #d94f4f;
+  --red-light: #fdf0f0;
+  --blue: #3a6b9a;
+  --blue-light: #e8f0f8;
+  --text: #1e2a1e;
+  --muted: #6b7a6b;
+  --border: #dde5d8;
+  --sidebar-w: 240px;
+  --header-h: 62px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+}
+
+body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── LOGIN ── */
+.login-screen {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, #f5f7f2 40%, #e8f2eb 100%);
+}
+.login-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 24px; padding: 3rem 2.5rem; width: 100%; max-width: 420px;
+  box-shadow: var(--shadow-lg);
+}
+.login-logo { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--accent-dark); margin-bottom: 0.3rem; }
+.login-logo span { color: var(--warm); }
+.login-subtitle { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin-bottom: 2rem; }
+.login-label { font-size: 0.78rem; font-weight: 800; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem; display: block; }
+.login-input {
+  width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 0.8rem 1rem; font-family: 'Nunito', sans-serif;
+  font-size: 0.92rem; font-weight: 600; color: var(--text); outline: none;
+  transition: border-color 0.2s; margin-bottom: 1rem;
+}
+.login-input:focus { border-color: var(--accent); background: var(--white); }
+.login-btn {
+  width: 100%; background: var(--accent); color: var(--white); border: none;
+  border-radius: 50px; padding: 0.9rem; font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: background 0.2s;
+  margin-top: 0.5rem;
+}
+.login-btn:hover { background: var(--accent-dark); }
+.login-error { color: var(--red); font-size: 0.82rem; font-weight: 700; margin-top: 0.5rem; display: none; }
+
+/* ── LAYOUT ── */
+.app { display: none; min-height: 100vh; }
+.app.active { display: flex; }
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-w); background: var(--white);
+  border-right: 1.5px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+}
+.sidebar-header {
+  padding: 1.4rem 1.5rem 1.2rem;
+  border-bottom: 1.5px solid var(--border);
+}
+.sidebar-logo { font-weight: 800; font-size: 1.1rem; color: var(--accent-dark); }
+.sidebar-logo span { color: var(--warm); }
+.sidebar-user { font-size: 0.75rem; color: var(--muted); font-weight: 600; margin-top: 0.2rem; }
+.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
+.nav-section-label {
+  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); padding: 0.8rem 1.5rem 0.4rem;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.65rem 1.5rem; cursor: pointer; font-size: 0.88rem; font-weight: 700;
+  color: var(--muted); border-radius: 0 50px 50px 0; margin-right: 1rem;
+  transition: all 0.2s; position: relative; text-decoration: none;
+}
+.nav-item:hover { background: var(--accent-light); color: var(--accent-dark); }
+.nav-item.active { background: var(--accent-light); color: var(--accent-dark); }
+.nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto; background: var(--red); color: var(--white);
+  font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.5rem;
+  border-radius: 50px; min-width: 18px; text-align: center;
+}
+.sidebar-footer {
+  padding: 1rem 1.5rem; border-top: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sidebar-footer-user { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+.logout-btn {
+  font-size: 0.75rem; color: var(--muted); background: none; border: none;
+  cursor: pointer; font-weight: 700; font-family: 'Nunito', sans-serif;
+  transition: color 0.2s;
+}
+.logout-btn:hover { color: var(--red); }
+
+/* Main content */
+.main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(245,247,242,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1.5px solid var(--border);
+  padding: 0 2rem; height: var(--header-h);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-title { font-family: 'Lora', serif; font-size: 1.2rem; font-weight: 600; color: var(--text); }
+.topbar-right { display: flex; align-items: center; gap: 1rem; }
+.topbar-btn {
+  background: var(--accent); color: var(--white); border: none;
+  padding: 0.5rem 1.2rem; border-radius: 50px; font-family: 'Nunito', sans-serif;
+  font-size: 0.82rem; font-weight: 800; cursor: pointer; transition: background 0.2s;
+}
+.topbar-btn:hover { background: var(--accent-dark); }
+.topbar-btn.outline {
+  background: transparent; color: var(--accent); border: 1.5px solid var(--accent);
+}
+.topbar-btn.outline:hover { background: var(--accent-light); }
+
+.page-content { padding: 2rem; display: none; }
+.page-content.active { display: block; }
+
+/* ── CARDS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 1.4rem 1.6rem;
+  box-shadow: var(--shadow);
+}
+.stat-label { font-size: 0.75rem; font-weight: 800; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.stat-value { font-size: 2rem; font-weight: 800; color: var(--text); line-height: 1; }
+.stat-sub { font-size: 0.78rem; color: var(--muted); font-weight: 600; margin-top: 0.3rem; }
+.stat-card.green { border-left: 4px solid var(--accent); }
+.stat-card.gold { border-left: 4px solid var(--warm); }
+.stat-card.red { border-left: 4px solid var(--red); }
+.stat-card.blue { border-left: 4px solid var(--blue); }
+
+/* ── GRID LAYOUT ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 1.4rem 1.6rem; box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 0.82rem; font-weight: 800; color: var(--muted);
+  letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title-action {
+  font-size: 0.75rem; color: var(--accent); font-weight: 700;
+  cursor: pointer; text-transform: none; letter-spacing: 0;
+}
+
+/* ── CALENDAR ── */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-header { font-size: 0.7rem; font-weight: 800; color: var(--muted); text-align: center; padding: 0.3rem 0; }
+.cal-day {
+  aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; transition: all 0.15s; position: relative; padding: 0.2rem;
+}
+.cal-day:hover { background: var(--accent-light); }
+.cal-day.today { background: var(--accent); color: var(--white); }
+.cal-day.has-booking { background: var(--warm-light); border: 1.5px solid var(--warm); color: var(--text); }
+.cal-day.blocked { background: var(--red-light); border: 1.5px solid #f0b0b0; color: var(--muted); }
+.cal-day.other-month { color: #ccc; }
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--warm); margin-top: 2px; }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.cal-nav-btn {
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 0.3rem 0.7rem; cursor: pointer; font-size: 0.85rem;
+  font-family: 'Nunito', sans-serif; font-weight: 700; transition: all 0.15s;
+}
+.cal-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cal-month { font-weight: 800; font-size: 0.92rem; }
+
+/* ── TODAY'S BOOKINGS ── */
+.booking-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.booking-item {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.7rem 0.9rem; background: var(--bg);
+  border-radius: 10px; border: 1.5px solid var(--border);
+  transition: border-color 0.2s;
+}
+.booking-item:hover { border-color: var(--accent); }
+.booking-time {
+  font-size: 0.78rem; font-weight: 800; color: var(--accent-dark);
+  min-width: 60px; background: var(--accent-light);
+  padding: 0.25rem 0.5rem; border-radius: 6px; text-align: center;
+}
+.booking-name { font-size: 0.88rem; font-weight: 800; color: var(--text); }
+.booking-plan { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.booking-source {
+  margin-left: auto; font-size: 0.7rem; font-weight: 800;
+  padding: 0.2rem 0.6rem; border-radius: 50px;
+}
+.source-fb { background: #e8eef8; color: #3b5998; }
+.source-google { background: #fef3e8; color: #d44638; }
+.source-qr { background: var(--accent-light); color: var(--accent-dark); }
+.source-direct { background: #f0f0f0; color: var(--muted); }
+
+/* ── BLOCK TIME ── */
+.block-form { display: flex; flex-direction: column; gap: 0.8rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-label { font-size: 0.74rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.form-input {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 0.65rem 0.9rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.88rem; font-weight: 600;
+  color: var(--text); outline: none; transition: border-color 0.2s; width: 100%;
+}
+.form-input:focus { border-color: var(--accent); background: var(--white); }
+select.form-input { cursor: pointer; }
+.btn {
+  background: var(--accent); color: var(--white); border: none;
+  padding: 0.65rem 1.4rem; border-radius: 50px; font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: background 0.2s;
+  width: fit-content;
+}
+.btn:hover { background: var(--accent-dark); }
+.btn.btn-red { background: var(--red); }
+.btn.btn-red:hover { background: #c04040; }
+.btn.btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+.btn.btn-outline:hover { background: var(--accent-light); }
+.btn.btn-gold { background: var(--warm); }
+.btn.btn-gold:hover { background: #b5852e; }
+.btn.btn-sm { padding: 0.4rem 0.9rem; font-size: 0.78rem; }
+
+.blocked-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+.blocked-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 0.9rem; background: var(--red-light);
+  border: 1.5px solid #f0c0c0; border-radius: 8px; font-size: 0.82rem; font-weight: 700;
+}
+
+/* ── LEADS TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+th {
+  text-align: left; padding: 0.7rem 0.9rem;
+  font-size: 0.7rem; font-weight: 800; color: var(--muted);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  border-bottom: 1.5px solid var(--border); white-space: nowrap;
+}
+td { padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--border); font-weight: 600; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+.status-badge {
+  display: inline-block; padding: 0.2rem 0.7rem; border-radius: 50px;
+  font-size: 0.7rem; font-weight: 800; white-space: nowrap;
+}
+.status-new { background: var(--blue-light); color: var(--blue); }
+.status-called { background: var(--accent-light); color: var(--accent-dark); }
+.status-signedup { background: #e8f8ee; color: #2a7a4a; }
+.status-followup { background: var(--warm-light); color: #8a6520; }
+.status-notinterested { background: var(--red-light); color: var(--red); }
+.td-muted { color: var(--muted); font-style: italic; }
+.lead-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.action-btn {
+  font-size: 0.7rem; font-weight: 800; padding: 0.22rem 0.6rem;
+  border-radius: 50px; border: 1.5px solid var(--border);
+  background: var(--white); cursor: pointer; font-family: 'Nunito', sans-serif;
+  transition: all 0.15s; color: var(--text);
+}
+.action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Table filters */
+.table-filters { display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+.filter-btn {
+  padding: 0.35rem 0.9rem; border-radius: 50px; border: 1.5px solid var(--border);
+  background: var(--white); font-family: 'Nunito', sans-serif; font-size: 0.78rem;
+  font-weight: 700; cursor: pointer; color: var(--muted); transition: all 0.15s;
+}
+.filter-btn.active { background: var(--accent); color: var(--white); border-color: var(--accent); }
+.search-input {
+  background: var(--white); border: 1.5px solid var(--border); border-radius: 50px;
+  padding: 0.35rem 1rem; font-family: 'Nunito', sans-serif; font-size: 0.82rem;
+  font-weight: 600; color: var(--text); outline: none; transition: border-color 0.2s;
+  margin-left: auto; min-width: 200px;
+}
+.search-input:focus { border-color: var(--accent); }
+
+/* ── ANALYTICS ── */
+.time-filter { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.analytics-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 1.2rem 1.4rem; box-shadow: var(--shadow);
+}
+.analytics-source { font-size: 0.75rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.analytics-num { font-size: 1.8rem; font-weight: 800; color: var(--text); }
+.analytics-detail { font-size: 0.78rem; color: var(--muted); font-weight: 600; margin-top: 0.3rem; }
+.analytics-trend { font-size: 0.75rem; font-weight: 800; margin-top: 0.4rem; }
+.trend-up { color: var(--accent); }
+.trend-down { color: var(--red); }
+.bar-chart { margin-top: 1rem; }
+.bar-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; }
+.bar-label { font-size: 0.78rem; font-weight: 700; color: var(--muted); min-width: 80px; }
+.bar-track { flex: 1; background: var(--bg); border-radius: 50px; height: 8px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 50px; transition: width 0.6s ease; }
+.bar-val { font-size: 0.78rem; font-weight: 800; color: var(--text); min-width: 30px; text-align: right; }
+
+/* ── ZIP MANAGER ── */
+.zip-list { display: flex; flex-direction: column; gap: 0.8rem; }
+.zip-item {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 1.2rem 1.4rem; box-shadow: var(--shadow);
+}
+.zip-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
+.zip-code { font-size: 1.1rem; font-weight: 800; color: var(--accent-dark); }
+.zip-city { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.zip-plans { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+.zip-plan-tag {
+  padding: 0.25rem 0.7rem; border-radius: 50px; font-size: 0.72rem; font-weight: 800;
+  background: var(--accent-light); color: var(--accent-dark);
+  border: 1px solid rgba(58,107,74,0.2);
+}
+.zip-addresses { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+
+/* ── REVIEWS ── */
+.review-list { display: flex; flex-direction: column; gap: 0.8rem; }
+.review-item {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 1.2rem 1.4rem;
+}
+.review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.review-stars { color: #f5a623; font-size: 0.95rem; }
+.review-name { font-size: 0.88rem; font-weight: 800; }
+.review-date { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.review-text { font-size: 0.85rem; color: var(--muted); font-style: italic; line-height: 1.65; margin-bottom: 0.8rem; }
+.review-actions { display: flex; gap: 0.5rem; }
+.review-pending { border-color: var(--warm); background: var(--warm-light); }
+
+/* ── TEAM ── */
+.team-list { display: flex; flex-direction: column; gap: 0.8rem; }
+.team-item {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 1rem 1.4rem;
+}
+.team-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.95rem; flex-shrink: 0;
+}
+.team-name { font-size: 0.9rem; font-weight: 800; }
+.team-role { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.team-stats { margin-left: auto; text-align: right; font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+
+/* ── ACTIVITY LOG ── */
+.activity-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.activity-item { display: flex; align-items: flex-start; gap: 0.8rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 0.35rem; }
+.activity-text { font-size: 0.82rem; font-weight: 600; color: var(--text); line-height: 1.5; }
+.activity-time { font-size: 0.74rem; color: var(--muted); font-weight: 600; margin-left: auto; white-space: nowrap; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: rgba(30,42,30,0.4); backdrop-filter: blur(6px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 2rem; max-width: 520px; width: 94%;
+  box-shadow: var(--shadow-lg); animation: scaleIn 0.25s ease;
+  max-height: 90vh; overflow-y: auto;
+}
+@keyframes scaleIn { from { opacity:0; transform:scale(0.95) } to { opacity:1; transform:none } }
+.modal-title { font-family: 'Lora', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 1.4rem; }
+.modal-footer { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.4rem; }
+.notes-area {
+  width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 0.8rem 1rem; font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem; font-weight: 600; color: var(--text); outline: none;
+  resize: vertical; min-height: 80px; transition: border-color 0.2s;
+}
+.notes-area:focus { border-color: var(--accent); }
+
+/* ── NOTIFICATIONS ── */
+.notif-dot {
+  position: absolute; top: 8px; right: 8px;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--red);
+}
+
+/* ── MISC ── */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.empty-state p { font-size: 0.9rem; font-weight: 600; }
+.page-header { margin-bottom: 1.5rem; }
+.page-header h1 { font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 600; margin-bottom: 0.3rem; }
+.page-header p { font-size: 0.88rem; color: var(--muted); font-weight: 600; }
+.section-gap { margin-bottom: 1.5rem; }
+.divider { border: none; border-top: 1.5px solid var(--border); margin: 1.2rem 0; }
+.tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 800; }
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.checkbox-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+.checkbox-item input { accent-color: var(--accent); cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">Your<span>FiberRep</span></div>
+    <div class="login-subtitle">Rep Dashboard — Sign In</div>
+    <label class="login-label">Username</label>
+    <input type="text" class="login-input" id="loginUsername" placeholder="Enter username">
+    <label class="login-label">Password</label>
+    <input type="password" class="login-input" id="loginPassword" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;">
+      <input type="checkbox" id="rememberMe" style="accent-color:var(--accent);cursor:pointer;width:16px;height:16px;">
+      <label for="rememberMe" style="font-size:0.82rem;font-weight:700;color:var(--muted);cursor:pointer;">Remember me</label>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-error" id="loginError">Incorrect username or password. Please try again.</div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div class="app" id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Your<span>FiberRep</span></div>
+      <div class="sidebar-user" id="sidebarUser">Loading...</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">🏠</span> Dashboard
+        <span class="nav-badge" id="newLeadBadge" style="display:none;">0</span>
+      </div>
+
+      <div class="nav-section-label">Leads & Bookings</div>
+      <div class="nav-item" onclick="showPage('leads')" id="nav-leads">
+        <span class="nav-icon">👥</span> All Leads
+      </div>
+      <div class="nav-item" onclick="showPage('calendar')" id="nav-calendar">
+        <span class="nav-icon">📅</span> Calendar
+      </div>
+
+      <div class="nav-section-label">Marketing</div>
+      <div class="nav-item" onclick="showPage('analytics')" id="nav-analytics">
+        <span class="nav-icon">📊</span> Analytics
+      </div>
+
+      <div class="nav-section-label">Settings</div>
+      <div class="nav-item" onclick="showPage('zipmanager')" id="nav-zipmanager">
+        <span class="nav-icon">📍</span> Zip Manager
+      </div>
+      <div class="nav-item" onclick="showPage('reviews')" id="nav-reviews">
+        <span class="nav-icon">⭐</span> Reviews
+        <span class="nav-badge" id="pendingReviewBadge" style="display:none;">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('team')" id="nav-team">
+        <span class="nav-icon">👤</span> Team
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-user" id="footerUser">—</div>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-right">
+        <button class="topbar-btn outline" onclick="exportLeads()">⬇ Export Leads</button>
+        <button class="topbar-btn" onclick="openBlockModal()">🚫 Block Time</button>
+      </div>
+    </div>
+
+    <!-- ── DASHBOARD PAGE ── -->
+    <div class="page-content active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">New Leads Today</div>
+          <div class="stat-value" id="stat-today">0</div>
+          <div class="stat-sub">Booked calls</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-label">Total Leads</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Signed Up</div>
+          <div class="stat-value" id="stat-signedup">0</div>
+          <div class="stat-sub">Conversions</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Calls Today</div>
+          <div class="stat-value" id="stat-callstoday">0</div>
+          <div class="stat-sub" id="stat-calltime">0 mins scheduled</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Mini Calendar -->
+        <div class="card">
+          <div class="card-title">
+            <span>Calendar</span>
+            <span class="card-title-action" onclick="showPage('calendar')">Full view →</span>
+          </div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+            <span class="cal-month" id="calMonthLabel"></span>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div style="display:flex; gap:1rem; margin-top:0.8rem; flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;font-weight:700;color:var(--muted);">
+              <div style="width:10px;height:10px;border-radius:2px;background:var(--warm-light);border:1px solid var(--warm);"></div> Booking
+            </div>
+            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;font-weight:700;color:var(--muted);">
+              <div style="width:10px;height:10px;border-radius:2px;background:var(--red-light);border:1px solid #f0b0b0;"></div> Blocked
+            </div>
+            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;font-weight:700;color:var(--muted);">
+              <div style="width:10px;height:10px;border-radius:2px;background:var(--accent);"></div> Today
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Bookings -->
+        <div class="card">
+          <div class="card-title">
+            <span>Today's Bookings</span>
+            <span class="card-title-action" onclick="showPage('leads')">All leads →</span>
+          </div>
+          <div class="booking-list" id="todayBookings">
+            <div class="empty-state"><p>No bookings today yet.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-title">Recent Activity</div>
+          <div class="activity-list" id="activityLog">
+            <div class="empty-state"><p>No activity yet.</p></div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card">
+          <div class="card-title">Marketing Performance</div>
+          <div class="bar-chart" id="dashBarChart">
+            <div class="bar-row">
+              <div class="bar-label">Facebook</div>
+              <div class="bar-track"><div class="bar-fill" style="width:0%;background:#3b5998;"></div></div>
+              <div class="bar-val" id="bar-fb">0</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Google</div>
+              <div class="bar-track"><div class="bar-fill" style="width:0%;background:#d44638;"></div></div>
+              <div class="bar-val" id="bar-google">0</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">QR Code</div>
+              <div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--accent);"></div></div>
+              <div class="bar-val" id="bar-qr">0</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Direct</div>
+              <div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--muted);"></div></div>
+              <div class="bar-val" id="bar-direct">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LEADS PAGE ── -->
+    <div class="page-content" id="page-leads">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+        <div><h1>All Leads</h1><p>Every customer who has booked a call through your website.</p></div>
+        <button class="btn" onclick="openAddLeadModal()">+ Add Lead</button>
+      </div>
+      <div class="table-filters">
+        <button class="filter-btn active" onclick="filterLeads('all', this)">All</button>
+        <button class="filter-btn" onclick="filterLeads('new', this)">New</button>
+        <button class="filter-btn" onclick="filterLeads('called', this)">Called</button>
+        <button class="filter-btn" onclick="filterLeads('followup', this)">Follow Up</button>
+        <button class="filter-btn" onclick="filterLeads('signedup', this)">Signed Up</button>
+        <button class="filter-btn" onclick="filterLeads('notinterested', this)">Not Interested</button>
+        <input type="text" class="search-input" placeholder="🔍 Search leads..." oninput="searchLeads(this.value)">
+      </div>
+      <div class="card" style="padding:0;">
+        <div class="table-wrap">
+          <table id="leadsTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Plan</th>
+                <th>Call Time</th>
+                <th>Source</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leadsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CALENDAR PAGE ── -->
+    <div class="page-content" id="page-calendar">
+      <div class="page-header">
+        <h1>Calendar</h1>
+        <p>All bookings and blocked times at a glance.</p>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+            <span class="cal-month" id="calMonthLabel2"></span>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+          </div>
+          <div class="cal-grid" id="calGrid2"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Selected Day — <span id="selectedDayLabel">Select a day</span></div>
+          <div id="selectedDayContent"><div class="empty-state"><p>Click a day to see bookings.</p></div></div>
+          <hr class="divider">
+          <div class="card-title" style="margin-top:0.5rem;">Block Time Off</div>
+          <div class="block-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-input" id="blockDate">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Reason (optional)</label>
+                <input type="text" class="form-input" id="blockReason" placeholder="e.g. Meeting, Holiday">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">From</label>
+                <select class="form-input" id="blockFrom"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">To</label>
+                <select class="form-input" id="blockTo"></select>
+              </div>
+            </div>
+            <button class="btn btn-red btn-sm" onclick="addBlock()">🚫 Block This Time</button>
+          </div>
+          <div class="blocked-list" id="blockedList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS PAGE ── -->
+    <div class="page-content" id="page-analytics">
+      <div class="page-header">
+        <h1>Marketing Analytics</h1>
+        <p>See how each of your channels is performing.</p>
+      </div>
+      <div class="time-filter">
+        <button class="filter-btn active" onclick="filterAnalytics('today', this)">Today</button>
+        <button class="filter-btn" onclick="filterAnalytics('7days', this)">Last 7 Days</button>
+        <button class="filter-btn" onclick="filterAnalytics('month', this)">Last Month</button>
+        <button class="filter-btn" onclick="filterAnalytics('6months', this)">Last 6 Months</button>
+        <button class="filter-btn" onclick="filterAnalytics('year', this)">Last Year</button>
+      </div>
+      <div class="analytics-grid" id="analyticsGrid"></div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Leads by Source</div>
+          <div class="bar-chart" id="analyticsBarChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Conversion Rate by Source</div>
+          <div class="bar-chart" id="conversionChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ZIP MANAGER PAGE ── -->
+    <div class="page-content" id="page-zipmanager">
+      <div class="page-header">
+        <h1>Zip Code Manager</h1>
+        <p>Control which plans and pricing show for each zip code in your territory.</p>
+      </div>
+      <div class="card section-gap">
+        <div class="card-title">Add New Zip Code</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Zip Code</label>
+            <input type="text" class="form-input" id="newZip" placeholder="e.g. 44012">
+          </div>
+          <div class="form-group">
+            <label class="form-label">City / Area Name</label>
+            <input type="text" class="form-input" id="newZipCity" placeholder="e.g. Avon Lake">
+          </div>
+        </div>
+        <div class="form-group" style="margin:0.8rem 0;">
+          <label class="form-label">Available Plans & Pricing</label>
+          <div id="zipPlanInputs" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:0.8rem;">
+          <label class="form-label">Eligible Street Addresses</label>
+          <textarea class="notes-area" id="newZipAddresses" placeholder="One address per line&#10;e.g.&#10;32812 Sorrento Ln&#10;32821 Webber Rd"></textarea>
+        </div>
+        <button class="btn" onclick="addZip()">+ Add Zip Code</button>
+      </div>
+      <div class="zip-list" id="zipList"></div>
+    </div>
+
+    <!-- ── REVIEWS PAGE ── -->
+    <div class="page-content" id="page-reviews">
+      <div class="page-header">
+        <h1>Review Management</h1>
+        <p>Approve or reject reviews before they appear on your website.</p>
+      </div>
+      <div class="table-filters" style="margin-bottom:1rem;">
+        <button class="filter-btn active" onclick="filterReviews('pending', this)">Pending Approval</button>
+        <button class="filter-btn" onclick="filterReviews('approved', this)">Approved</button>
+        <button class="filter-btn" onclick="filterReviews('rejected', this)">Rejected</button>
+      </div>
+      <div class="review-list" id="reviewList"></div>
+    </div>
+
+    <!-- ── TEAM PAGE ── -->
+    <div class="page-content" id="page-team">
+      <div class="page-header">
+        <h1>Team Management</h1>
+        <p>Manage logins and access for your team members.</p>
+      </div>
+      <div class="card section-gap">
+        <div class="card-title">Add Team Member</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="newMemberName" placeholder="e.g. John Smith">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-input" id="newMemberUser" placeholder="e.g. johnsmith">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="newMemberPass" placeholder="Set a password">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Role</label>
+            <select class="form-input" id="newMemberRole">
+              <option>Sales Rep</option>
+              <option>Admin</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" onclick="addTeamMember()">+ Add Member</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Team Members</div>
+        <div class="team-list" id="teamList"></div>
+      </div>
+      <div class="card" style="margin-top:1.5rem;">
+        <div class="card-title">Activity Log</div>
+        <div class="activity-list" id="fullActivityLog"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- LEAD DETAIL MODAL -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal">
+    <div class="modal-title" id="leadModalTitle">Lead Details</div>
+    <div id="leadModalContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('leadModal')">Close</button>
+      <button class="btn btn-sm" onclick="saveLeadNotes()">Save Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LEAD MODAL -->
+<div class="modal-overlay" id="addLeadModal">
+  <div class="modal">
+    <div class="modal-title">Add New Lead</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Full Name *</label><input type="text" class="form-input" id="newLeadName" placeholder="John Smith"></div>
+      <div class="form-group"><label class="form-label">Phone *</label><input type="tel" class="form-input" id="newLeadPhone" placeholder="(555) 000-0000"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="newLeadEmail" placeholder="john@email.com"></div>
+      <div class="form-group"><label class="form-label">Source</label>
+        <select class="form-input" id="newLeadSource">
+          <option value="website">Website</option>
+          <option value="facebook">Facebook Ad</option>
+          <option value="google">Google Ad</option>
+          <option value="qr">QR Code</option>
+          <option value="door">Door Knock</option>
+          <option value="direct">Direct</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:0.6rem;"><label class="form-label">Address</label><input type="text" class="form-input" id="newLeadAddress" placeholder="123 Main St, Avon Lake OH 44012"></div>
+    <div class="form-row" style="margin-top:0.6rem;">
+      <div class="form-group"><label class="form-label">Plan</label>
+        <select class="form-input" id="newLeadPlan">
+          <option value="">— Select —</option>
+          <option>Basic Plan – 200 Mbps</option>
+          <option>Mid-Tier Plan – 500 Mbps</option>
+          <option>High-Speed Plan – 1 Gig</option>
+          <option>Ultra-Fast Plan – 2 Gig</option>
+          <option>Hyper-Fast Plan – 5 Gig</option>
+          <option>Ultimate Plan – 8 Gig</option>
+          <option>Not sure – help me choose</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Install Date</label><input type="date" class="form-input" id="newLeadInstall"></div>
+    </div>
+    <div class="form-group" style="margin-top:0.6rem;"><label class="form-label">Notes</label><textarea class="notes-area" id="newLeadNotes" placeholder="Any additional notes..." style="min-height:60px;"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('addLeadModal')">Cancel</button>
+      <button class="btn btn-sm" onclick="addLeadManually()">Add Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- BLOCK TIME MODAL -->
+<div class="modal-overlay" id="blockModal">
+  <div class="modal">
+    <div class="modal-title">Block Time Off</div>
+    <div class="block-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-input" id="blockDateModal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-input" id="blockDateEndModal">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">From Time</label>
+          <select class="form-input" id="blockFromModal"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">To Time</label>
+          <select class="form-input" id="blockToModal"></select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:0.5rem;">
+        <label class="form-label">Reason (optional)</label>
+        <input type="text" class="form-input" id="blockReasonModal" placeholder="e.g. Meeting, Holiday">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('blockModal')">Cancel</button>
+      <button class="btn btn-red btn-sm" onclick="addBlockFromModal()">Block Time</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA STORE (localStorage for persistence) ──
+function save(key, val) { try { localStorage.setItem('yfr_' + key, JSON.stringify(val)); } catch(e){} }
+function load(key, def) { try { const v = localStorage.getItem('yfr_' + key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+
+// ── DEFAULT DATA ──
+const defaultUsers = [
+  { username: 'brian', password: 'fiber2024', name: 'Brian', role: 'Admin' }
+];
+const defaultLeads = [
+  { id: 1, name: 'Sarah Mitchell', phone: '(555) 210-4432', email: 'sarah.m@email.com', address: '32812 Sorrento Ln, Avon Lake OH 44012', plan: 'High-Speed Plan – 1 Gig Fiber', slot: '2026-06-05 at 10:00 AM ET', source: 'facebook', status: 'new', notes: '', followup: null, date: '2026-06-04' },
+  { id: 2, name: 'David Kowalski', phone: '(555) 338-9921', email: '', address: '591 Deer Run Ln, Avon Lake OH 44012', plan: 'Ultra-Fast Plan – 2 Gig Fiber', slot: '2026-06-05 at 2:00 PM ET', source: 'google', status: 'called', notes: 'Very interested, has 4 kids streaming at once', followup: null, date: '2026-06-03' },
+  { id: 3, name: 'Maria Gonzalez', phone: '(555) 441-7720', email: 'maria.g@gmail.com', address: '1611 Center Rd, Avon OH 44011', plan: 'Mid-Tier Plan – 500 Mbps Fiber', slot: '2026-06-06 at 11:30 AM ET', source: 'qr', status: 'signedup', notes: 'Signed up on the call. Install booked for June 10.', followup: null, date: '2026-06-02' },
+  { id: 4, name: 'Tom Bradley', phone: '(555) 882-3310', email: 'tbradley@yahoo.com', address: '32956 Webber Rd, Avon Lake OH 44012', plan: 'Not sure – help me choose', slot: '2026-06-07 at 9:00 AM ET', source: 'facebook', status: 'followup', notes: 'Wants to discuss further. Call back Thursday.', followup: '2026-06-07', date: '2026-06-03' },
+  { id: 5, name: 'Jen Carlisle', phone: '(555) 119-6644', email: '', address: '32807 Webber Rd, Avon Lake OH 44012', plan: 'Basic Plan – 200 Mbps Fiber', slot: '2026-06-04 at 3:30 PM ET', source: 'direct', status: 'notinterested', notes: 'Happy with current provider.', followup: null, date: '2026-06-01' },
+];
+const defaultZips = [
+  {
+    zip: '44012', city: 'Avon Lake', plans: [
+      { name: 'Basic Plan – 200 Mbps', price: '$29.99/mo', gift: 'None' },
+      { name: 'Mid-Tier Plan – 500 Mbps', price: '$39.99/mo', gift: '$150 Gift Card' },
+      { name: 'High-Speed Plan – 1 Gig', price: '$39.99/mo', gift: '$200 Gift Card' },
+      { name: 'Ultra-Fast Plan – 2 Gig', price: '$49.99/mo', gift: '$300 Gift Card' },
+    ],
+    addresses: '32812 Sorrento Ln\n32821 Webber Rd\n32956 Webber Rd\n654 Avon Belden Rd\n591 Deer Run Ln\n32807 Webber Rd\n32811 Sorrento Ln\n32854 Rebecca Lane\n32815 Rebecca Lane\n32780 Webber Rd\n32908 Webber Rd\n32930 Fox Chappel Ln'
+  },
+  {
+    zip: '44011', city: 'Avon', plans: [
+      { name: 'Basic Plan – 200 Mbps', price: '$29.99/mo', gift: 'None' },
+      { name: 'Mid-Tier Plan – 500 Mbps', price: '$39.99/mo', gift: '$150 Gift Card' },
+      { name: 'High-Speed Plan – 1 Gig', price: '$39.99/mo', gift: '$200 Gift Card' },
+    ],
+    addresses: '2425 Norton Pl\n1611 Center Rd'
+  }
+];
+const defaultReviews = [
+  { id: 1, name: 'Sarah M.', stars: 5, text: "Brian made the whole process so easy. Couldn't recommend more!", date: '2026-06-01', status: 'approved' },
+  { id: 2, name: 'James T.', stars: 5, text: "Called Brightspeed directly first and got passed around. Brian sorted everything in one call.", date: '2026-06-02', status: 'approved' },
+  { id: 3, name: 'Kevin O.', stars: 4, text: "Really helpful rep. Answered all my questions without any pressure.", date: '2026-06-04', status: 'pending' },
+];
+const defaultBlocks = [];
+const defaultActivity = [
+  { text: 'New lead: Sarah Mitchell booked a call', time: 'Today 9:22am', user: 'System' },
+  { text: 'Lead status updated: David Kowalski → Called', time: 'Today 8:45am', user: 'Brian' },
+  { text: 'New lead: Tom Bradley booked a call', time: 'Yesterday 4:10pm', user: 'System' },
+  { text: 'Review approved: Sarah M. ★★★★★', time: 'Yesterday 2:30pm', user: 'Brian' },
+];
+
+// ── STATE ──
+let currentUser = null;
+let leads = load('leads', defaultLeads);
+let zips = load('zips', defaultZips);
+let reviews = load('reviews', defaultReviews);
+let blocks = load('blocks', defaultBlocks);
+let activity = load('activity', defaultActivity);
+let users = load('users', defaultUsers);
+let currentLeadFilter = 'all';
+let currentReviewFilter = 'pending';
+let currentAnalyticsPeriod = 'today';
+let calMonth = new Date().getMonth();
+let calYear = new Date().getFullYear();
+let selectedLeadId = null;
+
+// ── LOGIN ──
+function doLogin() {
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value;
+  const remember = document.getElementById('rememberMe').checked;
+  const user = users.find(x => x.username === u && x.password === p);
+  if (user) {
+    currentUser = user;
+    // Save session
+    if (remember) {
+      localStorage.setItem('yfr_session', JSON.stringify({ username: user.username, remember: true }));
+    } else {
+      sessionStorage.setItem('yfr_session', JSON.stringify({ username: user.username }));
+    }
+    showApp(user);
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function showApp(user) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  document.getElementById('sidebarUser').textContent = user.role;
+  document.getElementById('footerUser').textContent = user.name;
+  document.getElementById('loginError').style.display = 'none';
+  initApp();
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('yfr_session');
+  sessionStorage.removeItem('yfr_session');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('loginUsername').value = '';
+  document.getElementById('loginPassword').value = '';
+}
+
+function checkSavedSession() {
+  const saved = localStorage.getItem('yfr_session') || sessionStorage.getItem('yfr_session');
+  if (saved) {
+    try {
+      const session = JSON.parse(saved);
+      const user = users.find(u => u.username === session.username);
+      if (user) { currentUser = user; showApp(user); return true; }
+    } catch(e) {}
+  }
+  return false;
+}
+
+// ── NAVIGATION ──
+function showPage(id) {
+  document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+  const titles = { dashboard:'Dashboard', leads:'All Leads', calendar:'Calendar', analytics:'Analytics', zipmanager:'Zip Manager', reviews:'Reviews', team:'Team' };
+  document.getElementById('topbarTitle').textContent = titles[id] || id;
+  if (id === 'leads') renderLeads();
+  if (id === 'analytics') renderAnalytics();
+  if (id === 'calendar') { renderCal('calGrid2', 'calMonthLabel2'); renderBlockSelects(); renderBlockedList(); }
+  if (id === 'zipmanager') { renderZips(); renderZipPlanInputs(); }
+  if (id === 'reviews') renderReviews();
+  if (id === 'team') renderTeam();
+}
+
+// ── INIT ──
+function initApp() {
+  renderDashboard();
+  renderCal('calGrid', 'calMonthLabel');
+  checkNewLeadBadge();
+  updateReviewBadge();
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const today = new Date().toISOString().slice(0,10);
+  const todayLeads = leads.filter(l => l.date === today);
+  const signedUp = leads.filter(l => l.status === 'signedup').length;
+  const todayCalls = leads.filter(l => l.slot && l.slot.startsWith(today.slice(0,10))).length;
+
+  document.getElementById('stat-today').textContent = todayLeads.length;
+  document.getElementById('stat-total').textContent = leads.length;
+  document.getElementById('stat-signedup').textContent = signedUp;
+  document.getElementById('stat-callstoday').textContent = todayCalls;
+  document.getElementById('stat-calltime').textContent = (todayCalls * 30) + ' mins scheduled';
+
+  // Today's bookings
+  const todayEl = document.getElementById('todayBookings');
+  const todaySlots = leads.filter(l => l.slot && l.slot.includes(today.replace(/-/g, '-')));
+  if (todaySlots.length === 0) {
+    todayEl.innerHTML = '<div class="empty-state"><p>No bookings today yet.</p></div>';
+  } else {
+    todayEl.innerHTML = todaySlots.map(l => `
+      <div class="booking-item">
+        <div class="booking-time">${l.slot.split(' at ')[1] || '—'}</div>
+        <div>
+          <div class="booking-name">${l.name}</div>
+          <div class="booking-plan">${l.plan || '—'}</div>
+        </div>
+        <div class="booking-source source-${l.source}">${l.source}</div>
+      </div>`).join('');
+  }
+
+  // Activity log
+  const actEl = document.getElementById('activityLog');
+  actEl.innerHTML = activity.slice(0,6).map(a => `
+    <div class="activity-item">
+      <div class="activity-dot"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>`).join('') || '<div class="empty-state"><p>No activity yet.</p></div>';
+
+  // Bar chart
+  renderDashBars();
+}
+
+function renderDashBars() {
+  const sources = { facebook: 0, google: 0, qr: 0, direct: 0 };
+  leads.forEach(l => { if (sources[l.source] !== undefined) sources[l.source]++; });
+  const max = Math.max(...Object.values(sources), 1);
+  ['fb','google','qr','direct'].forEach((k, i) => {
+    const src = ['facebook','google','qr','direct'][i];
+    const val = sources[src];
+    document.getElementById('bar-' + k).textContent = val;
+    const fills = document.querySelectorAll('#dashBarChart .bar-fill');
+    if (fills[i]) fills[i].style.width = (val/max*100) + '%';
+  });
+}
+
+// ── CALENDAR ──
+function renderCal(gridId, labelId) {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById(labelId).textContent = months[calMonth] + ' ' + calYear;
+  const grid = document.getElementById(gridId);
+  const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html = days.map(d => `<div class="cal-header">${d}</div>`).join('');
+  const first = new Date(calYear, calMonth, 1).getDay();
+  const total = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date();
+  for (let i = 0; i < first; i++) html += `<div class="cal-day other-month"></div>`;
+  for (let d = 1; d <= total; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+    const hasBooking = leads.some(l => l.slot && l.slot.startsWith(dateStr));
+    const isBlocked = blocks.some(b => b.date === dateStr);
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    else if (isBlocked) cls += ' blocked';
+    else if (hasBooking) cls += ' has-booking';
+    html += `<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${hasBooking && !isToday ? '<div class="cal-dot"></div>' : ''}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCal('calGrid', 'calMonthLabel');
+  if (document.getElementById('page-calendar').classList.contains('active'))
+    renderCal('calGrid2', 'calMonthLabel2');
+}
+
+function selectCalDay(dateStr) {
+  document.getElementById('selectedDayLabel').textContent = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+  const dayLeads = leads.filter(l => l.slot && l.slot.startsWith(dateStr));
+  const isBlocked = blocks.filter(b => b.date === dateStr);
+  let html = '';
+  if (dayLeads.length === 0 && isBlocked.length === 0) html = '<div class="empty-state"><p>Nothing scheduled.</p></div>';
+  dayLeads.forEach(l => {
+    html += `<div class="booking-item" style="margin-bottom:0.5rem;">
+      <div class="booking-time">${l.slot.split(' at ')[1] || '—'}</div>
+      <div><div class="booking-name">${l.name}</div><div class="booking-plan">${l.phone}</div></div>
+      <div class="booking-source source-${l.source}">${l.source}</div>
+    </div>`;
+  });
+  isBlocked.forEach(b => {
+    html += `<div class="booking-item" style="background:var(--red-light);border-color:#f0b0b0;">
+      <div class="booking-time" style="background:#fdd;color:var(--red);">BLOCKED</div>
+      <div><div class="booking-name">${b.from} — ${b.to}</div><div class="booking-plan">${b.reason || 'No reason given'}</div></div>
+      <button class="btn btn-red btn-sm" onclick="removeBlock('${b.id}')">Remove</button>
+    </div>`;
+  });
+  document.getElementById('selectedDayContent').innerHTML = html;
+}
+
+function renderBlockSelects() {
+  const times = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const h12 = h > 12 ? h-12 : h === 0 ? 12 : h;
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      times.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} (${h12}:${String(m).padStart(2,'0')} ${ampm})`);
+    }
+  }
+  ['blockFrom','blockTo','blockFromModal','blockToModal'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = times.map((t,i) => `<option value="${t.split(' ')[0]}">${t}</option>`).join('');
+  });
+}
+
+function addBlock() {
+  const dateStart = document.getElementById('blockDate').value;
+  const dateEnd = document.getElementById('blockDateEnd').value || dateStart;
+  const from = document.getElementById('blockFrom').value;
+  const to = document.getElementById('blockTo').value;
+  const reason = document.getElementById('blockReason').value;
+  if (!dateStart) { alert('Please select a start date.'); return; }
+  // Add a block entry for each day in the range
+  const start = new Date(dateStart + 'T12:00:00');
+  const end = new Date(dateEnd + 'T12:00:00');
+  let d = new Date(start);
+  while (d <= end) {
+    const dateStr = d.toISOString().slice(0,10);
+    blocks.push({ id: Date.now().toString() + Math.random(), date: dateStr, from, to, reason });
+    d.setDate(d.getDate() + 1);
+  }
+  save('blocks', blocks);
+  renderCal('calGrid', 'calMonthLabel');
+  renderCal('calGrid2', 'calMonthLabel2');
+  renderBlockedList();
+  const rangeLabel = dateStart === dateEnd ? dateStart : `${dateStart} to ${dateEnd}`;
+  logActivity(`Time blocked: ${rangeLabel} ${from}–${to}`);
+}
+
+function addBlockFromModal() {
+  const dateStart = document.getElementById('blockDateModal').value;
+  const dateEnd = document.getElementById('blockDateEndModal').value || dateStart;
+  const from = document.getElementById('blockFromModal').value;
+  const to = document.getElementById('blockToModal').value;
+  const reason = document.getElementById('blockReasonModal').value;
+  if (!dateStart) { alert('Please select a start date.'); return; }
+  const start = new Date(dateStart + 'T12:00:00');
+  const end = new Date(dateEnd + 'T12:00:00');
+  let d = new Date(start);
+  while (d <= end) {
+    const dateStr = d.toISOString().slice(0,10);
+    blocks.push({ id: Date.now().toString() + Math.random(), date: dateStr, from, to, reason });
+    d.setDate(d.getDate() + 1);
+  }
+  save('blocks', blocks);
+  closeModal('blockModal');
+  renderCal('calGrid', 'calMonthLabel');
+  const rangeLabel = dateStart === dateEnd ? dateStart : `${dateStart} to ${dateEnd}`;
+  logActivity(`Time blocked: ${rangeLabel} ${from}–${to}`);
+}
+
+function removeBlock(id) {
+  blocks = blocks.filter(b => b.id !== id);
+  save('blocks', blocks);
+  renderCal('calGrid', 'calMonthLabel');
+  renderCal('calGrid2', 'calMonthLabel2');
+  renderBlockedList();
+}
+
+function renderBlockedList() {
+  const el = document.getElementById('blockedList');
+  if (!el) return;
+  if (blocks.length === 0) { el.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);font-weight:600;margin-top:0.5rem;">No blocked times.</div>'; return; }
+  el.innerHTML = blocks.map(b => `
+    <div class="blocked-item">
+      <span>${b.date} | ${b.from} – ${b.to}${b.reason ? ' — ' + b.reason : ''}</span>
+      <button class="btn btn-red btn-sm" onclick="removeBlock('${b.id}')">Remove</button>
+    </div>`).join('');
+}
+
+// ── LEADS ──
+function renderLeads(filter, search) {
+  filter = filter || currentLeadFilter;
+  let filtered = [...leads];
+  if (filter !== 'all') filtered = filtered.filter(l => l.status === filter);
+  if (search) filtered = filtered.filter(l =>
+    l.name.toLowerCase().includes(search) ||
+    (l.phone||'').includes(search) ||
+    (l.email||'').toLowerCase().includes(search) ||
+    (l.address||'').toLowerCase().includes(search)
+  );
+  const tbody = document.getElementById('leadsBody');
+  if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:2rem;">No leads found.</td></tr>'; return; }
+  tbody.innerHTML = filtered.map(l => `
+    <tr>
+      <td><strong>${l.name}</strong></td>
+      <td>${l.phone || '<span class="td-muted">—</span>'}</td>
+      <td>${l.email || '<span class="td-muted">—</span>'}</td>
+      <td style="max-width:160px;font-size:0.78rem;">${l.address || '<span class="td-muted">—</span>'}</td>
+      <td style="max-width:130px;font-size:0.78rem;">${l.plan || '<span class="td-muted">—</span>'}</td>
+      <td style="font-size:0.78rem;">${l.slot || '<span class="td-muted">—</span>'}</td>
+      <td><span class="booking-source source-${l.source}" style="font-size:0.72rem;">${l.source}</span></td>
+      <td><span class="status-badge status-${l.status}">${statusLabel(l.status)}</span></td>
+      <td style="max-width:120px;font-size:0.78rem;">${l.notes || '<span class="td-muted">—</span>'}</td>
+      <td>
+        <div class="lead-actions">
+          <button class="action-btn" onclick="openLeadModal(${l.id})">View</button>
+          <select class="action-btn" style="cursor:pointer;" onchange="updateStatus(${l.id}, this.value)">
+            <option value="">Status</option>
+            <option value="new">New</option>
+            <option value="called">Called</option>
+            <option value="followup">Follow Up</option>
+            <option value="signedup">Signed Up</option>
+            <option value="notinterested">Not Interested</option>
+            <option value="delete" style="color:var(--red);">🗑 Delete Lead</option>
+          </select>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function statusLabel(s) {
+  return { new:'New', called:'Called', followup:'Follow Up', signedup:'Signed Up', notinterested:'Not Interested' }[s] || s;
+}
+
+function filterLeads(filter, btn) {
+  currentLeadFilter = filter;
+  document.querySelectorAll('.table-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeads(filter);
+}
+
+function searchLeads(val) { renderLeads(currentLeadFilter, val.toLowerCase()); }
+
+function updateStatus(id, status) {
+  if (!status) return;
+  if (status === 'delete') {
+    if (!confirm('Delete this lead? This cannot be undone.')) return;
+    leads = leads.filter(l => l.id !== id);
+    save('leads', leads);
+    renderLeads();
+    renderDashboard();
+    logActivity('Lead deleted');
+    return;
+  }
+  const lead = leads.find(l => l.id === id);
+  if (lead) {
+    lead.status = status;
+    save('leads', leads);
+    renderLeads();
+    renderDashboard();
+    logActivity(`Lead status updated: ${lead.name} → ${statusLabel(status)}`);
+  }
+}
+
+function openLeadModal(id) {
+  selectedLeadId = id;
+  const l = leads.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('leadModalTitle').textContent = l.name;
+  document.getElementById('leadModalContent').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem;">
+      ${field('Phone', l.phone)} ${field('Email', l.email)}
+      ${field('Address', l.address)} ${field('Plan', l.plan)}
+      ${field('Call Time', l.slot)} ${field('Source', l.source)}
+      ${field('Status', statusLabel(l.status))} ${field('Booked', l.date)}
+    </div>
+    <div class="form-group">
+      <label class="form-label">Private Notes</label>
+      <textarea class="notes-area" id="modalNotes" placeholder="Add notes about this lead...">${l.notes || ''}</textarea>
+    </div>
+    <div class="form-group" style="margin-top:0.8rem;">
+      <label class="form-label">Follow-up Date</label>
+      <input type="date" class="form-input" id="modalFollowup" value="${l.followup || ''}">
+    </div>`;
+  document.getElementById('leadModal').classList.add('active');
+}
+
+function field(label, val) {
+  return `<div><div style="font-size:0.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">${label}</div><div style="font-size:0.85rem;font-weight:700;">${val || '<span style="color:var(--muted);font-style:italic;">—</span>'}</div></div>`;
+}
+
+function saveLeadNotes() {
+  const lead = leads.find(l => l.id === selectedLeadId);
+  if (lead) {
+    lead.notes = document.getElementById('modalNotes').value;
+    lead.followup = document.getElementById('modalFollowup').value;
+    save('leads', leads);
+    renderLeads();
+    closeModal('leadModal');
+    logActivity(`Notes updated: ${lead.name}`);
+  }
+}
+
+// ── ANALYTICS ──
+function renderAnalytics() {
+  const sources = ['facebook','google','qr','direct'];
+  const labels = { facebook:'Facebook Ads', google:'Google Ads', qr:'QR Code / Leaflet', direct:'Direct / Other' };
+  const colors = { facebook:'#3b5998', google:'#d44638', qr:'#3a6b4a', direct:'#888' };
+
+  const filtered = getFilteredLeads(currentAnalyticsPeriod);
+  const signed = filtered.filter(l => l.status === 'signedup');
+  const total = filtered.length;
+
+  const grid = document.getElementById('analyticsGrid');
+  grid.innerHTML = sources.map(s => {
+    const count = filtered.filter(l => l.source === s).length;
+    const conv = filtered.filter(l => l.source === s && l.status === 'signedup').length;
+    const rate = count > 0 ? Math.round(conv/count*100) : 0;
+    return `<div class="analytics-card">
+      <div class="analytics-source">${labels[s]}</div>
+      <div class="analytics-num">${count}</div>
+      <div class="analytics-detail">${conv} signed up · ${rate}% conversion</div>
+      <div class="analytics-trend ${count > 0 ? 'trend-up' : ''}">${count > 0 ? '↑ Active' : '— No data'}</div>
+    </div>`;
+  }).join('');
+
+  // Bar charts
+  const max = Math.max(...sources.map(s => filtered.filter(l => l.source === s).length), 1);
+  document.getElementById('analyticsBarChart').innerHTML = sources.map(s => {
+    const count = filtered.filter(l => l.source === s).length;
+    return `<div class="bar-row">
+      <div class="bar-label" style="font-size:0.75rem;">${labels[s]}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${count/max*100}%;background:${colors[s]};"></div></div>
+      <div class="bar-val">${count}</div>
+    </div>`;
+  }).join('');
+
+  const maxConv = Math.max(...sources.map(s => {
+    const c = filtered.filter(l => l.source === s).length;
+    const sv = filtered.filter(l => l.source === s && l.status === 'signedup').length;
+    return c > 0 ? Math.round(sv/c*100) : 0;
+  }), 1);
+  document.getElementById('conversionChart').innerHTML = sources.map(s => {
+    const c = filtered.filter(l => l.source === s).length;
+    const sv = filtered.filter(l => l.source === s && l.status === 'signedup').length;
+    const rate = c > 0 ? Math.round(sv/c*100) : 0;
+    return `<div class="bar-row">
+      <div class="bar-label" style="font-size:0.75rem;">${labels[s]}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${rate/maxConv*100}%;background:${colors[s]};"></div></div>
+      <div class="bar-val">${rate}%</div>
+    </div>`;
+  }).join('');
+}
+
+function getFilteredLeads(period) {
+  const now = new Date();
+  return leads.filter(l => {
+    const d = new Date(l.date);
+    if (period === 'today') return l.date === now.toISOString().slice(0,10);
+    if (period === '7days') return (now - d) <= 7*86400000;
+    if (period === 'month') return (now - d) <= 30*86400000;
+    if (period === '6months') return (now - d) <= 180*86400000;
+    if (period === 'year') return (now - d) <= 365*86400000;
+    return true;
+  });
+}
+
+function filterAnalytics(period, btn) {
+  currentAnalyticsPeriod = period;
+  document.querySelectorAll('#page-analytics .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAnalytics();
+}
+
+// ── ZIP MANAGER ──
+const allPlans = ['Basic Plan – 200 Mbps','Mid-Tier Plan – 500 Mbps','High-Speed Plan – 1 Gig','Ultra-Fast Plan – 2 Gig','Hyper-Fast Plan – 5 Gig','Ultimate Plan – 8 Gig'];
+
+function renderZipPlanInputs() {
+  document.getElementById('zipPlanInputs').innerHTML = allPlans.map((p,i) => `
+    <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
+      <label class="checkbox-item"><input type="checkbox" id="zipPlan${i}" value="${p}"> ${p}</label>
+      <input type="text" class="form-input" id="zipPrice${i}" placeholder="Price e.g. $29.99/mo" style="max-width:160px;padding:0.4rem 0.7rem;font-size:0.8rem;">
+      <input type="text" class="form-input" id="zipGift${i}" placeholder="Gift card e.g. $150" style="max-width:140px;padding:0.4rem 0.7rem;font-size:0.8rem;">
+    </div>`).join('');
+}
+
+function addZip() {
+  const zip = document.getElementById('newZip').value.trim();
+  const city = document.getElementById('newZipCity').value.trim();
+  const addresses = document.getElementById('newZipAddresses').value.trim();
+  if (!zip || !city) { alert('Please enter a zip code and city.'); return; }
+  if (zips.find(z => z.zip === zip)) { alert('This zip code already exists. Please edit the existing entry.'); return; }
+  const plans = [];
+  allPlans.forEach((p,i) => {
+    if (document.getElementById('zipPlan'+i).checked) {
+      plans.push({ name: p, price: document.getElementById('zipPrice'+i).value || '—', gift: document.getElementById('zipGift'+i).value || 'None' });
+    }
+  });
+  zips.push({ zip, city, plans, addresses });
+  save('zips', zips);
+  renderZips();
+  logActivity(`New zip added: ${zip} ${city}`);
+  document.getElementById('newZip').value = '';
+  document.getElementById('newZipCity').value = '';
+  document.getElementById('newZipAddresses').value = '';
+  renderZipPlanInputs();
+}
+
+function renderZips() {
+  document.getElementById('zipList').innerHTML = zips.map(z => `
+    <div class="zip-item" id="zip-item-${z.zip}">
+      <div class="zip-header">
+        <div>
+          <div class="zip-code">${z.zip} — ${z.city}</div>
+          <div class="zip-addresses">${(z.addresses||'').split('\n').filter(Boolean).length} addresses loaded</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-outline btn-sm" onclick="editZip('${z.zip}')">✏️ Edit</button>
+          <button class="btn btn-red btn-sm" onclick="deleteZip('${z.zip}')">Remove</button>
+        </div>
+      </div>
+      <div class="zip-plans">${z.plans.map(p => `<div class="zip-plan-tag">${p.name} · ${p.price}${p.gift && p.gift !== 'None' ? ' · 🎁 ' + p.gift : ''}</div>`).join('')}</div>
+      <div id="zip-edit-${z.zip}" style="display:none;margin-top:1rem;padding:1rem;background:var(--bg);border-radius:10px;border:1.5px solid var(--border);">
+        <div class="form-row" style="margin-bottom:0.8rem;">
+          <div class="form-group">
+            <label class="form-label">City Name</label>
+            <input type="text" class="form-input" id="edit-city-${z.zip}" value="${z.city}">
+          </div>
+        </div>
+        <div class="form-label" style="margin-bottom:0.5rem;">Plans & Pricing</div>
+        ${allPlans.map((p,i) => {
+          const existing = z.plans.find(ep => ep.name === p);
+          return `<div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+            <label class="checkbox-item"><input type="checkbox" id="edit-plan-${z.zip}-${i}" value="${p}" ${existing ? 'checked' : ''}> ${p}</label>
+            <input type="text" class="form-input" id="edit-price-${z.zip}-${i}" value="${existing ? existing.price : ''}" placeholder="Price" style="max-width:140px;padding:0.35rem 0.7rem;font-size:0.78rem;">
+            <input type="text" class="form-input" id="edit-gift-${z.zip}-${i}" value="${existing ? existing.gift : ''}" placeholder="Gift card" style="max-width:130px;padding:0.35rem 0.7rem;font-size:0.78rem;">
+          </div>`;
+        }).join('')}
+        <div class="form-group" style="margin-top:0.8rem;">
+          <label class="form-label">Eligible Addresses</label>
+          <textarea class="notes-area" id="edit-addresses-${z.zip}" style="min-height:60px;">${z.addresses||''}</textarea>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.8rem;">
+          <button class="btn btn-sm" onclick="saveZipEdit('${z.zip}')">Save Changes</button>
+          <button class="btn btn-outline btn-sm" onclick="cancelZipEdit('${z.zip}')">Cancel</button>
+        </div>
+      </div>
+    </div>`).join('') || '<div class="empty-state"><p>No zip codes added yet.</p></div>';
+}
+
+function editZip(zip) {
+  document.getElementById('zip-edit-' + zip).style.display = 'block';
+}
+
+function cancelZipEdit(zip) {
+  document.getElementById('zip-edit-' + zip).style.display = 'none';
+}
+
+function saveZipEdit(zip) {
+  const z = zips.find(x => x.zip === zip);
+  if (!z) return;
+  z.city = document.getElementById('edit-city-' + zip).value;
+  z.addresses = document.getElementById('edit-addresses-' + zip).value;
+  z.plans = [];
+  allPlans.forEach((p, i) => {
+    if (document.getElementById(`edit-plan-${zip}-${i}`).checked) {
+      z.plans.push({
+        name: p,
+        price: document.getElementById(`edit-price-${zip}-${i}`).value || '—',
+        gift: document.getElementById(`edit-gift-${zip}-${i}`).value || 'None'
+      });
+    }
+  });
+  save('zips', zips);
+  renderZips();
+  logActivity(`Zip code updated: ${zip}`);
+}
+
+function deleteZip(zip) {
+  if (!confirm(`Remove zip code ${zip}?`)) return;
+  zips = zips.filter(z => z.zip !== zip);
+  save('zips', zips);
+  renderZips();
+}
+
+// ── REVIEWS ──
+function renderReviews() {
+  const filtered = reviews.filter(r => r.status === currentReviewFilter);
+  document.getElementById('reviewList').innerHTML = filtered.length === 0
+    ? '<div class="empty-state"><p>No reviews in this category.</p></div>'
+    : filtered.map(r => `
+      <div class="review-item ${r.status === 'pending' ? 'review-pending' : ''}">
+        <div class="review-header">
+          <div>
+            <div class="review-name">${r.name}</div>
+            <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+          </div>
+          <div class="review-date">${r.date}</div>
+        </div>
+        <div class="review-text">"${r.text}"</div>
+        <div class="review-actions">
+          ${r.status === 'pending' ? `<button class="btn btn-sm" onclick="approveReview(${r.id})">✓ Approve</button><button class="btn btn-red btn-sm" onclick="rejectReview(${r.id})">✗ Reject</button>` : ''}
+          ${r.status === 'approved' ? `<span style="font-size:0.78rem;color:var(--accent);font-weight:800;">✓ Live on website</span>` : ''}
+          ${r.status === 'rejected' ? `<button class="btn btn-outline btn-sm" onclick="approveReview(${r.id})">Restore</button>` : ''}
+        </div>
+      </div>`).join('');
+}
+
+function updateReviewBadge() {
+  const pending = reviews.filter(r => r.status === 'pending').length;
+  const badge = document.getElementById('pendingReviewBadge');
+  if (badge) {
+    badge.style.display = pending > 0 ? 'inline-block' : 'none';
+    badge.textContent = pending;
+  }
+}
+
+function filterReviews(f, btn) {
+  currentReviewFilter = f;
+  document.querySelectorAll('#page-reviews .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderReviews();
+}
+
+function approveReview(id) {
+  const r = reviews.find(x => x.id === id);
+  if (r) { r.status = 'approved'; save('reviews', reviews); renderReviews(); updateReviewBadge(); logActivity(`Review approved: ${r.name}`); }
+}
+
+function rejectReview(id) {
+  const r = reviews.find(x => x.id === id);
+  if (r) { r.status = 'rejected'; save('reviews', reviews); renderReviews(); updateReviewBadge(); logActivity(`Review rejected: ${r.name}`); }
+}
+
+// ── TEAM ──
+function renderTeam() {
+  document.getElementById('teamList').innerHTML = users.map(u => `
+    <div class="team-item">
+      <div class="team-avatar">${u.name.charAt(0)}</div>
+      <div>
+        <div class="team-name">${u.name}</div>
+        <div class="team-role">${u.role} · @${u.username}</div>
+      </div>
+      ${u.username !== currentUser.username ? `<button class="btn btn-red btn-sm" style="margin-left:auto;" onclick="removeMember('${u.username}')">Remove</button>` : '<div style="margin-left:auto;font-size:0.75rem;color:var(--accent);font-weight:800;">You</div>'}
+    </div>`).join('') || '<div class="empty-state"><p>No team members yet.</p></div>';
+
+  document.getElementById('fullActivityLog').innerHTML = activity.map(a => `
+    <div class="activity-item">
+      <div class="activity-dot"></div>
+      <div class="activity-text">${a.text} <span style="color:var(--accent);font-weight:800;">(${a.user})</span></div>
+      <div class="activity-time">${a.time}</div>
+    </div>`).join('') || '<div class="empty-state"><p>No activity logged.</p></div>';
+}
+
+function addTeamMember() {
+  const name = document.getElementById('newMemberName').value.trim();
+  const username = document.getElementById('newMemberUser').value.trim();
+  const password = document.getElementById('newMemberPass').value;
+  const role = document.getElementById('newMemberRole').value;
+  if (!name || !username || !password) { alert('Please fill in all fields.'); return; }
+  if (users.find(u => u.username === username)) { alert('Username already taken.'); return; }
+  users.push({ username, password, name, role });
+  save('users', users);
+  renderTeam();
+  logActivity(`New team member added: ${name}`);
+  document.getElementById('newMemberName').value = '';
+  document.getElementById('newMemberUser').value = '';
+  document.getElementById('newMemberPass').value = '';
+}
+
+function removeMember(username) {
+  if (!confirm('Remove this team member?')) return;
+  users = users.filter(u => u.username !== username);
+  save('users', users);
+  renderTeam();
+}
+
+// ── UTILITIES ──
+function logActivity(text) {
+  const now = new Date();
+  activity.unshift({ text, time: 'Just now', user: currentUser ? currentUser.name : 'System' });
+  if (activity.length > 50) activity.pop();
+  save('activity', activity);
+}
+
+function checkNewLeadBadge() {
+  const today = new Date().toISOString().slice(0,10);
+  const count = leads.filter(l => l.date === today && l.status === 'new').length;
+  const badge = document.getElementById('newLeadBadge');
+  badge.style.display = count > 0 ? 'inline-block' : 'none';
+  badge.textContent = count;
+}
+
+function openAddLeadModal() {
+  ['newLeadName','newLeadPhone','newLeadEmail','newLeadAddress','newLeadNotes'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('addLeadModal').classList.add('active');
+}
+
+function addLeadManually() {
+  const name = document.getElementById('newLeadName').value.trim();
+  const phone = document.getElementById('newLeadPhone').value.trim();
+  if (!name || !phone) { alert('Please enter at least a name and phone number.'); return; }
+  const newLead = {
+    id: Date.now(),
+    name,
+    phone,
+    email: document.getElementById('newLeadEmail').value.trim(),
+    address: document.getElementById('newLeadAddress').value.trim(),
+    plan: document.getElementById('newLeadPlan').value,
+    source: document.getElementById('newLeadSource').value,
+    status: 'new',
+    notes: document.getElementById('newLeadNotes').value.trim(),
+    installDate: document.getElementById('newLeadInstall').value,
+    slot: document.getElementById('newLeadInstall').value || '—',
+    date: new Date().toISOString().slice(0,10)
+  };
+  leads.unshift(newLead);
+  save('leads', leads);
+  renderLeads();
+  renderDashboard();
+  closeModal('addLeadModal');
+  logActivity(`Lead added manually: ${name} (${newLead.source})`);
+  checkNewLeadBadge();
+}
+
+function exportLeads() {
+  const headers = ['Name','Phone','Email','Address','Plan','Call Time','Source','Status','Notes','Date'];
+  const rows = leads.map(l => [l.name, l.phone||'', l.email||'', l.address||'', l.plan||'', l.slot||'', l.source, statusLabel(l.status), l.notes||'', l.date]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'yourfiberrep-leads.csv'; a.click();
+  logActivity('Leads exported to CSV');
+}
+
+function openBlockModal() {
+  renderBlockSelects();
+  document.getElementById('blockModal').classList.add('active');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+// Auto-login from saved session
+document.addEventListener('DOMContentLoaded', function() {
+  checkSavedSession();
+});
+</script>
+</body>
+</html>
