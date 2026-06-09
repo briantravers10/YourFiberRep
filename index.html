@@ -977,6 +977,85 @@
     .page-wrapper { margin-left: 0 !important; padding-top: 62px; }
   }
 
+
+  /* ── WHY FIBER PAGE ── */
+  .use-case-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem; margin-top: 1.5rem;
+  }
+  .use-case {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 1.4rem 1.2rem;
+    transition: box-shadow 0.2s;
+  }
+  .use-case:hover { box-shadow: var(--shadow); }
+  .use-case-icon { font-size: 1.8rem; margin-bottom: 0.7rem; display: block; }
+  .use-case h3 { font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 0.4rem; }
+  .use-case p { font-size: 0.82rem; color: var(--muted); font-weight: 500; line-height: 1.6; }
+
+  .news-section { background: var(--bg); padding: 3rem 4rem; }
+  .news-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2rem; margin-top: 1.5rem;
+  }
+  .news-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 1.4rem 1.2rem;
+    display: flex; flex-direction: column;
+  }
+  .news-source {
+    font-size: 0.72rem; font-weight: 800; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem;
+  }
+  .news-card h3 { font-size: 0.92rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem; line-height: 1.4; }
+  .news-card p { font-size: 0.8rem; color: var(--muted); font-weight: 500; line-height: 1.6; flex: 1; }
+  .news-link {
+    display: inline-block; margin-top: 0.8rem;
+    font-size: 0.8rem; font-weight: 700; color: var(--accent);
+    text-decoration: none;
+  }
+  .news-link:hover { text-decoration: underline; }
+
+  .fiber-switch {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+    color: var(--white); padding: 4rem; text-align: center;
+  }
+  .fiber-switch h2 { font-size: 2rem; font-weight: 800; margin-bottom: 0.8rem; }
+  .fiber-switch p { font-size: 1rem; opacity: 0.9; margin-bottom: 1.5rem; }
+
+  @media (max-width: 768px) {
+    .use-case-grid { grid-template-columns: 1fr 1fr; }
+    .news-grid { grid-template-columns: 1fr; }
+    .news-section { padding: 3rem 1.5rem; }
+    .fiber-switch { padding: 3rem 1.5rem; }
+    .fiber-switch h2 { font-size: 1.5rem; }
+  }
+
+
+  /* ── USE CASE CARDS ── */
+  .use-cases {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem; margin-top: 1.5rem;
+  }
+  .use-case-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 1.4rem 1.2rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .use-case-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .use-case-icon { font-size: 1.8rem; margin-bottom: 0.7rem; display: block; }
+  .use-case-card h3 { font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 0.4rem; }
+  .use-case-card p { font-size: 0.82rem; color: var(--muted); font-weight: 500; line-height: 1.6; }
+  .use-case-expand { font-size: 0.78rem; color: var(--accent); font-weight: 700; cursor: pointer; background: none; border: none; padding: 0; margin-top: 0.5rem; }
+
+  @media (max-width: 767px) {
+    .use-cases { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 480px) {
+    .use-cases { grid-template-columns: 1fr; }
+  }
+
 </style>
 </head>
 <body>
