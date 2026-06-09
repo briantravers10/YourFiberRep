@@ -1630,6 +1630,88 @@ function addLeadManually() {
   checkNewLeadBadge();
 }
 
+// ── LEADS TABLE ──
+let currentLeadFilter = 'all';
+let currentLeadSearch = '';
+
+function renderLeads() {
+  const tbody = document.getElementById('leadsBody');
+  if (!tbody) return;
+  let filtered = leads;
+  if (currentLeadFilter !== 'all') {
+    filtered = filtered.filter(l => l.status === currentLeadFilter);
+  }
+  if (currentLeadSearch) {
+    const q = currentLeadSearch.toLowerCase();
+    filtered = filtered.filter(l =>
+      (l.name||'').toLowerCase().includes(q) ||
+      (l.phone||'').toLowerCase().includes(q) ||
+      (l.email||'').toLowerCase().includes(q) ||
+      (l.address||'').toLowerCase().includes(q)
+    );
+  }
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted);">No leads found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(l => `
+    <tr style="cursor:pointer;" onclick="showLeadModal(leads.find(x=>x.id==${l.id}))">
+      <td><div style="font-weight:700;">${l.name||'—'}</div><div style="font-size:0.75rem;color:var(--muted);">${l.date||''}</div></td>
+      <td>${l.phone||'—'}</td>
+      <td>${l.email||'—'}</td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.address||'—'}</td>
+      <td>${l.plan||'—'}</td>
+      <td>${l.slot||'—'}</td>
+      <td><span class="booking-source source-${l.source}">${l.source||'—'}</span></td>
+      <td><span class="status-badge status-${l.status}">${statusLabel(l.status)}</span></td>
+      <td>
+        <select class="action-btn" onclick="event.stopPropagation();" onchange="updateLeadStatus(${l.id}, this.value)">
+          <option value="">Action</option>
+          <option value="new">New</option>
+          <option value="called">Called</option>
+          <option value="followup">Follow Up</option>
+          <option value="signedup">Signed Up</option>
+          <option value="notinterested">Not Interested</option>
+          <option value="delete" style="color:red;">🗑 Delete</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+
+function filterLeads(status, btn) {
+  currentLeadFilter = status;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderLeads();
+}
+
+function searchLeads(query) {
+  currentLeadSearch = query;
+  renderLeads();
+}
+
+function updateLeadStatus(id, status) {
+  if (!status) return;
+  if (status === 'delete') {
+    if (!confirm('Delete this lead? This cannot be undone.')) return;
+    leads = leads.filter(l => l.id != id);
+    save('leads', leads);
+    renderLeads();
+    renderDashboard();
+    logActivity('Lead deleted');
+    return;
+  }
+  var lead = leads.find(l => l.id == id);
+  if (lead) {
+    lead.status = status;
+    save('leads', leads);
+    renderLeads();
+    renderDashboard();
+    logActivity('Lead status updated: ' + lead.name + ' → ' + statusLabel(status));
+  }
+}
+
+
 function exportLeads() {
   const headers = ['Name','Phone','Email','Address','Plan','Call Time','Source','Status','Notes','Date'];
   const rows = leads.map(l => [l.name, l.phone||'', l.email||'', l.address||'', l.plan||'', l.slot||'', l.source, statusLabel(l.status), l.notes||'', l.date]);
