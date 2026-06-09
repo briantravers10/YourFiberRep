@@ -177,6 +177,9 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 .cal-day:hover { background: var(--accent-light); }
 .cal-day.today { background: var(--accent); color: var(--white); }
 .cal-day.has-booking { background: var(--warm-light); border: 1.5px solid var(--warm); color: var(--text); }
+  .has-followup { background: #eef3ff; border: 1.5px solid #4a6fa5; color: #4a6fa5; font-weight: 700; }
+  .cal-lead-card { transition: box-shadow 0.15s, transform 0.15s; }
+  .cal-lead-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-1px); }
 .cal-day.blocked { background: var(--red-light); border: 1.5px solid #f0b0b0; color: var(--muted); }
 .cal-day.other-month { color: #ccc; }
 .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--warm); margin-top: 2px; }
@@ -799,12 +802,12 @@ tr:hover td { background: var(--bg); }
 
 <!-- LEAD DETAIL MODAL -->
 <div class="modal-overlay" id="leadModal">
-  <div class="modal">
+  <div class="modal" style="max-width:600px;">
     <div class="modal-title" id="leadModalTitle">Lead Details</div>
     <div id="leadModalContent"></div>
     <div class="modal-footer">
-      <button class="btn btn-outline btn-sm" onclick="closeModal('leadModal')">Close</button>
-      <button class="btn btn-sm" onclick="saveLeadNotes()">Save Notes</button>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('leadModal')">Cancel</button>
+      <button class="btn btn-sm" onclick="saveLeadNotes()">💾 Save Changes</button>
     </div>
   </div>
 </div>
@@ -1100,12 +1103,17 @@ function renderCal(gridId, labelId) {
     const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
     const hasBooking = leads.some(l => l.slot && l.slot.startsWith(dateStr));
+    const hasFollowUp = leads.some(l => l.followUpDate === dateStr);
     const isBlocked = blocks.some(b => b.date === dateStr);
     let cls = 'cal-day';
     if (isToday) cls += ' today';
     else if (isBlocked) cls += ' blocked';
     else if (hasBooking) cls += ' has-booking';
-    html += `<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${hasBooking && !isToday ? '<div class="cal-dot"></div>' : ''}</div>`;
+    else if (hasFollowUp) cls += ' has-followup';
+    let dots = '';
+    if (hasBooking && !isToday) dots += '<div class="cal-dot"></div>';
+    if (hasFollowUp && !isToday) dots += '<div class="cal-dot" style="background:#4a6fa5;"></div>';
+    html += `<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${dots}</div>`;
   }
   grid.innerHTML = html;
 }
@@ -1122,14 +1130,31 @@ function changeMonth(dir) {
 function selectCalDay(dateStr) {
   document.getElementById('selectedDayLabel').textContent = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
   const dayLeads = leads.filter(l => l.slot && l.slot.startsWith(dateStr));
+  const followUps = leads.filter(l => l.followUpDate === dateStr);
   const isBlocked = blocks.filter(b => b.date === dateStr);
   let html = '';
-  if (dayLeads.length === 0 && isBlocked.length === 0) html = '<div class="empty-state"><p>Nothing scheduled.</p></div>';
+  if (dayLeads.length === 0 && followUps.length === 0 && isBlocked.length === 0) {
+    html = '<div class="empty-state"><p>Nothing scheduled.</p></div>';
+  }
   dayLeads.forEach(l => {
-    html += `<div class="booking-item" style="margin-bottom:0.5rem;">
+    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;" onclick="openLeadFromCal(${l.id})">
       <div class="booking-time">${l.slot.split(' at ')[1] || '—'}</div>
-      <div><div class="booking-name">${l.name}</div><div class="booking-plan">${l.phone}</div></div>
+      <div style="flex:1;">
+        <div class="booking-name">${l.name}</div>
+        <div class="booking-plan">${l.phone || '—'}</div>
+      </div>
       <div class="booking-source source-${l.source}">${l.source}</div>
+      <span style="font-size:0.75rem;color:var(--muted);margin-left:0.3rem;">→</span>
+    </div>`;
+  });
+  followUps.forEach(l => {
+    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border-color:#b0c4f0;" onclick="openLeadFromCal(${l.id})">
+      <div class="booking-time" style="background:#4a6fa5;color:#fff;">FOLLOW UP</div>
+      <div style="flex:1;">
+        <div class="booking-name">${l.name}</div>
+        <div class="booking-plan">${l.phone || '—'}</div>
+      </div>
+      <span style="font-size:0.75rem;color:var(--muted);">→</span>
     </div>`;
   });
   isBlocked.forEach(b => {
@@ -1140,6 +1165,60 @@ function selectCalDay(dateStr) {
     </div>`;
   });
   document.getElementById('selectedDayContent').innerHTML = html;
+}
+
+function openLeadFromCal(id) {
+  const lead = leads.find(l => l.id === id);
+  if (!lead) return;
+  openLeadModal(lead);
+}
+
+function openLeadModal(lead) {
+  document.getElementById('leadModalTitle').textContent = lead.name || 'Lead Details';
+  const fields = [
+    { label: 'First Name', value: lead.name ? lead.name.split(' ')[0] : '' },
+    { label: 'Last Name', value: lead.name && lead.name.split(' ').length > 1 ? lead.name.split(' ').slice(1).join(' ') : '' },
+    { label: 'Phone', value: lead.phone || '' },
+    { label: 'Email', value: lead.email || '' },
+    { label: 'Address', value: lead.address || '' },
+    { label: 'Plan', value: lead.plan || '' },
+    { label: 'Source', value: lead.source || '' },
+    { label: 'Status', value: statusLabel(lead.status) || '' },
+    { label: 'Call Time', value: lead.slot || '' },
+    { label: 'Install Date', value: lead.installDate || '' },
+    { label: 'Follow-Up Date', value: lead.followUpDate || '' },
+    { label: 'Date Added', value: lead.date || '' },
+  ];
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem;">';
+  fields.forEach(f => {
+    html += `<div style="background:var(--bg);border-radius:10px;padding:0.7rem 0.9rem;">
+      <div style="font-size:0.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">${f.label}</div>
+      <div style="font-size:0.88rem;font-weight:700;color:var(--text);">${f.value || '<span style="color:var(--muted);font-weight:500;">—</span>'}</div>
+    </div>`;
+  });
+  html += '</div>';
+  html += `<div style="margin-bottom:0.8rem;">
+    <label style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Private Notes</label>
+    <textarea id="leadNoteInput" class="notes-area" style="margin-top:0.4rem;min-height:80px;">${lead.notes || ''}</textarea>
+  </div>`;
+  html += `<div style="margin-bottom:0.5rem;">
+    <label style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Follow-Up Date</label>
+    <input type="date" id="leadFollowUpInput" class="form-input" style="margin-top:0.4rem;" value="${lead.followUpDate || ''}">
+  </div>`;
+  html += `<div style="margin-bottom:0.5rem;">
+    <label style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Update Status</label>
+    <select id="leadStatusInput" class="form-input" style="margin-top:0.4rem;">
+      <option value="new" ${lead.status==='new'?'selected':''}>New</option>
+      <option value="called" ${lead.status==='called'?'selected':''}>Called</option>
+      <option value="followup" ${lead.status==='followup'?'selected':''}>Follow Up</option>
+      <option value="signedup" ${lead.status==='signedup'?'selected':''}>Signed Up</option>
+      <option value="notinterested" ${lead.status==='notinterested'?'selected':''}>Not Interested</option>
+    </select>
+  </div>`;
+  document.getElementById('leadModalContent').innerHTML = html;
+  document.getElementById('leadModal').classList.add('active');
+  // Store lead id for save
+  document.getElementById('leadModal').dataset.leadId = lead.id;
 }
 
 function renderBlockSelects() {
@@ -1325,14 +1404,24 @@ function field(label, val) {
 }
 
 function saveLeadNotes() {
-  const lead = leads.find(l => l.id === selectedLeadId);
+  const modal = document.getElementById('leadModal');
+  const leadId = parseInt(modal.dataset.leadId) || selectedLeadId;
+  const lead = leads.find(l => l.id === leadId);
   if (lead) {
-    lead.notes = document.getElementById('modalNotes').value;
-    lead.followup = document.getElementById('modalFollowup').value;
+    const notesEl = document.getElementById('leadNoteInput');
+    const followUpEl = document.getElementById('leadFollowUpInput');
+    const statusEl = document.getElementById('leadStatusInput');
+    if (notesEl) lead.notes = notesEl.value;
+    if (followUpEl) lead.followUpDate = followUpEl.value;
+    if (statusEl) lead.status = statusEl.value;
     save('leads', leads);
     renderLeads();
+    renderCal('calGrid', 'calMonthLabel');
     closeModal('leadModal');
-    logActivity(`Notes updated: ${lead.name}`);
+    logActivity(`Lead updated: ${lead.name}`);
+    if (lead.followUpDate) {
+      logActivity(`Follow-up set for ${lead.name} on ${lead.followUpDate}`);
+    }
   }
 }
 
