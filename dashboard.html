@@ -1149,7 +1149,7 @@ function selectCalDay(dateStr) {
     html = '<div class="empty-state"><p>Nothing scheduled.</p></div>';
   }
   dayLeads.forEach(l => {
-    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;" onclick="openLeadFromCal(${l.id})">
+    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;" onclick="openLeadFromCal('${l.id}')">
       <div class="booking-time">${l.slot.split(' at ')[1] || '—'}</div>
       <div style="flex:1;">
         <div class="booking-name">${l.name}</div>
@@ -1160,7 +1160,7 @@ function selectCalDay(dateStr) {
     </div>`;
   });
   followUps.forEach(l => {
-    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border-color:#b0c4f0;" onclick="openLeadFromCal(${l.id})">
+    html += `<div class="booking-item cal-lead-card" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border-color:#b0c4f0;" onclick="openLeadFromCal('${l.id}')">
       <div class="booking-time" style="background:#4a6fa5;color:#fff;">FOLLOW UP</div>
       <div style="flex:1;">
         <div class="booking-name">${l.name}</div>
@@ -1180,7 +1180,8 @@ function selectCalDay(dateStr) {
 }
 
 function openLeadFromCal(id) {
-  const lead = leads.find(l => l.id === id);
+  // Match by id regardless of string/number type
+  const lead = leads.find(l => String(l.id) === String(id));
   if (!lead) return;
   openLeadModal(lead);
 }
