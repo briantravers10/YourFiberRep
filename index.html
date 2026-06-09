@@ -474,136 +474,39 @@
 
   /* ── SIDEBAR NAV ── */
   .sidebar {
-    position: fixed; left: 0; top: 0; bottom: 0; width: 230px; z-index: 200;
-    background: var(--white); border-right: 1.5px solid var(--border);
-    display: flex; flex-direction: column; padding: 2rem 0;
-    box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+    width: var(--sidebar-w);
+    background: var(--white);
+    border-right: 1.5px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top: 62px; left: 0; bottom: 0; z-index: 100;
     transition: transform 0.3s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.05);
   }
-  .sidebar-logo {
-    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.1rem;
-    color: var(--accent-dark); padding: 0 1.5rem 1.8rem;
-    border-bottom: 1.5px solid var(--border); margin-bottom: 1.2rem;
-  }
-  .sidebar-logo span { color: var(--warm); }
-  .sidebar-nav { list-style: none; flex: 1; }
-  .sidebar-nav li a {
-    display: flex; align-items: center; gap: 0.75rem;
-    padding: 0.75rem 1.5rem; text-decoration: none;
-    color: var(--muted); font-weight: 700; font-size: 0.9rem;
-    border-radius: 0 50px 50px 0; margin-right: 1rem;
-    transition: background 0.2s, color 0.2s;
-  }
-  .sidebar-nav li a:hover, .sidebar-nav li a.active {
-    background: var(--accent-light); color: var(--accent-dark);
-  }
-  .sidebar-nav li a .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
-  .sidebar-cta {
-    margin: 0 1rem;
-    background: var(--accent); color: #fff; border: none;
-    padding: 0.85rem 1.2rem; border-radius: 50px;
-    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem;
-    cursor: pointer; text-decoration: none; display: block; text-align: center;
-    transition: background 0.2s;
-  }
-  .sidebar-cta:hover { background: var(--accent-dark); }
-  .sidebar-phone {
-    margin: 1rem 1rem 0; padding: 0.8rem 1rem;
-    background: var(--bg); border-radius: 12px; border: 1.5px solid var(--border);
-    text-align: center;
-  }
-  .sidebar-phone a { color: var(--accent-dark); font-weight: 800; font-size: 0.85rem; text-decoration: none; }
-  .sidebar-phone p { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; font-weight: 600; }
 
-  /* Hamburger for mobile */
-  .hamburger {
-    display: none; position: fixed; top: 1rem; left: 1rem; z-index: 300;
-    background: var(--white); border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 0.5rem 0.7rem; cursor: pointer;
-    font-size: 1.2rem; box-shadow: var(--shadow);
+  /* Desktop & iPad landscape: sidebar always visible, content pushed right */
+  @media (min-width: 900px) {
+    .sidebar { transform: none !important; }
+    .page-wrapper { margin-left: var(--sidebar-w); }
+    .sticky-header { left: 0; }
+    .promo-banner { left: 0; }
+    .hamburger { display: none !important; }
+    .sidebar-overlay { display: none !important; }
   }
+
+  /* Mobile & iPad portrait: sidebar slides in over content */
+  @media (max-width: 899px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .page-wrapper { margin-left: 0; }
+    .hamburger { display: flex !important; }
+  }
+
   .sidebar-overlay {
-    display: none; position: fixed; inset: 0; z-index: 190;
+    display: none; position: fixed; inset: 0; z-index: 99;
     background: rgba(0,0,0,0.3);
   }
+  .sidebar-overlay.open { display: block; }
 
-  /* Push content right on desktop */
-  body.has-sidebar .page-content { margin-left: 230px; }
-  body.has-sidebar nav { display: none; }
-  /* Active page handles its own margin */
-  body.has-sidebar .page.active { margin-left: 230px; padding-top: 62px; }
-  @media (max-width: 900px) {
-    body.has-sidebar .page.active { margin-left: 0 !important; }
-  }
-
-  /* ── PAGES ── */
-  .page {
-    display: none !important;
-  }
-  .page.active {
-    display: block !important;
-    min-height: 100vh;
-  }
-
-  /* ── WHY FIBER PAGE ── */
-  .fiber-hero {
-    background: linear-gradient(160deg, #f5f7f2 50%, #e8f2eb 100%);
-    padding: 5rem 4rem 3rem;
-  }
-  .fiber-hero h1 { font-family: 'Lora', serif; font-size: clamp(2rem,4vw,3rem); font-weight:600; margin-bottom:1rem; }
-  .fiber-hero p { color: var(--muted); font-size:1.05rem; max-width:600px; line-height:1.75; }
-
-  .comparison-table {
-    width: 100%; border-collapse: collapse; margin: 2rem 0;
-    font-size: 0.9rem;
-  }
-  .comparison-table th {
-    padding: 1rem 1.2rem; text-align: left; font-weight: 800;
-    font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase;
-  }
-  .comparison-table th:first-child { background: var(--bg); color: var(--muted); border-radius: 10px 0 0 0; }
-  .comparison-table th.fiber-col { background: var(--accent); color: #fff; }
-  .comparison-table th.dsl-col { background: #e0e0e0; color: var(--muted); border-radius: 0 10px 0 0; }
-  .comparison-table td { padding: 0.85rem 1.2rem; border-bottom: 1px solid var(--border); font-weight: 600; }
-  .comparison-table tr:last-child td { border-bottom: none; }
-  .comparison-table td:first-child { color: var(--text); background: var(--bg); }
-  .comparison-table td.fiber-val { background: var(--accent-light); color: var(--accent-dark); }
-  .comparison-table td.dsl-val { background: #f5f5f5; color: var(--muted); }
-  .check { color: var(--green); font-weight: 800; }
-  .cross { color: #c05050; font-weight: 800; }
-
-  .use-cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:1.2rem; margin: 2rem 0; }
-  .use-case-card {
-    background: var(--white); border: 1.5px solid var(--border);
-    border-radius: 16px; padding: 1.6rem;
-    transition: box-shadow 0.3s, transform 0.3s;
-  }
-  .use-case-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
-  .use-case-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
-  .use-case-card h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 0.4rem; }
-  .use-case-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; font-weight: 500; }
-  .use-case-highlight { color: var(--accent-dark); font-weight: 700; }
-
-  .news-section { background: var(--white); padding: 3rem 4rem; }
-  .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 1.2rem; margin-top: 2rem; }
-  .news-card {
-    background: var(--bg); border: 1.5px solid var(--border);
-    border-radius: 14px; padding: 1.5rem;
-    transition: box-shadow 0.3s, transform 0.3s;
-  }
-  .news-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
-  .news-source { font-size: 0.72rem; font-weight: 800; color: var(--warm); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
-  .news-card h3 { font-size: 0.92rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem; line-height: 1.4; }
-  .news-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; font-weight: 500; margin-bottom: 0.8rem; }
-  .news-link { font-size: 0.8rem; color: var(--accent); font-weight: 700; text-decoration: none; }
-  .news-link:hover { color: var(--accent-dark); text-decoration: underline; }
-
-  @media (max-width: 900px) {
-    .hamburger { display: block; }
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open { transform: none; }
-    .sidebar-overlay.open { display: block; }
-    body.has-sidebar .page.active { margin-left: 0 !important; }
     .fiber-hero { padding: 4rem 1.5rem 2rem; }
     .news-section { padding: 3rem 1.5rem; }
   }
@@ -1011,6 +914,23 @@
     transform: translateY(0);
   }
 
+
+  /* ── PAGES ── */
+  .page { display: none !important; }
+  .page.active { display: block !important; min-height: 50vh; }
+
+  /* ── PAGE WRAPPER ── */
+  .page-wrapper {
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+  }
+  @media (min-width: 900px) {
+    .page-wrapper { margin-left: var(--sidebar-w); padding-top: 62px; }
+  }
+  @media (max-width: 899px) {
+    .page-wrapper { margin-left: 0; padding-top: 62px; }
+  }
+
 </style>
 </head>
 <body>
@@ -1059,6 +979,7 @@
   </div>
 </aside>
 
+<div class="page-wrapper">
 <!-- ═══ PAGES ═══ -->
 
 <div id="page-fiber" class="page">
@@ -1928,6 +1849,8 @@
 </div>
 </div>
 
+</div><!-- end page-wrapper -->
+
 <!-- ═══ GLOBAL ELEMENTS ═══ -->
 
 <!-- Review Modal -->
@@ -2011,39 +1934,37 @@
   document.body.classList.add('has-sidebar');
 
   function showPage(id) {
-    // Remove 'page-' prefix if included
     var pageId = id.replace('page-', '');
-    // valid pages
-    var validPages = ['home','plans','booking','checker','fiber','reviews','faq'];
-    // Hide all pages
+    // Hide ALL pages using multiple methods for maximum compatibility
     var allPages = document.querySelectorAll('.page');
     for (var i = 0; i < allPages.length; i++) {
-      allPages[i].style.cssText = 'display: none !important;';
+      allPages[i].setAttribute('style', 'display:none!important');
       allPages[i].classList.remove('active');
     }
-    // Remove active from all nav links
+    // Remove active nav
     var allNav = document.querySelectorAll('.sidebar-nav a');
     for (var j = 0; j < allNav.length; j++) {
       allNav[j].classList.remove('active');
     }
-    // Show selected page
+    // Show target page
     var page = document.getElementById('page-' + pageId);
     if (page) {
-      page.style.cssText = 'display: block !important;';
+      page.setAttribute('style', 'display:block!important');
       page.classList.add('active');
     }
-    // Highlight nav item
-    var navItem = document.getElementById('nav-' + pageId);
-    if (navItem) navItem.classList.add('active');
-    // Scroll to top
+    // Active nav
+    var navEl = document.getElementById('nav-' + pageId);
+    if (navEl) navEl.classList.add('active');
+    // Scroll top
     window.scrollTo(0, 0);
-    // Close sidebar on mobile
+    document.querySelector('.page-wrapper') && (document.querySelector('.page-wrapper').scrollTop = 0);
+    // Mobile: close sidebar
     if (window.innerWidth < 900) closeSidebar();
-    // Init calendar on booking page
+    // Booking: init calendar
     if (pageId === 'booking') {
       setTimeout(function() {
         buildDayGrid('dayGrid2', 'timeStepInForm2', 'timeGrid2', 'calConfirmStep2', 'calSelectedTime2', 'selectedSlot2');
-      }, 50);
+      }, 100);
     }
   }
 
@@ -2438,12 +2359,12 @@
     // Hide all pages first, then show home
     var allPages = document.querySelectorAll('.page');
     for (var i = 0; i < allPages.length; i++) {
-      allPages[i].style.cssText = 'display: none !important;';
+      allPages[i].setAttribute('style', 'display:none!important');
       allPages[i].classList.remove('active');
     }
     var homePage = document.getElementById('page-home');
     if (homePage) {
-      homePage.style.cssText = 'display: block !important;';
+      homePage.setAttribute('style', 'display:block!important');
       homePage.classList.add('active');
     }
     // Init calendar
@@ -2453,19 +2374,19 @@
   });
 
 
-  // ── SCROLL ANIMATIONS ── (only on home page, only when page is active)
-  function initScrollAnimations() {
-    var fadeEls = document.querySelectorAll('#page-home .fade-up');
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.08 });
-    fadeEls.forEach(function(el) { observer.observe(el); });
+  // ── SCROLL ANIMATIONS ──
+  function checkFadeEls() {
+    var els = document.querySelectorAll('#page-home .fade-up');
+    var windowHeight = window.innerHeight;
+    for (var i = 0; i < els.length; i++) {
+      var rect = els[i].getBoundingClientRect();
+      if (rect.top < windowHeight * 0.92) {
+        els[i].classList.add('visible');
+      }
+    }
   }
-  initScrollAnimations();
+  window.addEventListener('scroll', checkFadeEls);
+  setTimeout(checkFadeEls, 300);
 
   // Enter key on address inputs
   const ai1 = document.getElementById('addressInput');
