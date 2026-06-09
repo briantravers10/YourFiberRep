@@ -814,9 +814,12 @@ tr:hover td { background: var(--bg); }
   <div class="modal" style="max-width:600px;">
     <div class="modal-title" id="leadModalTitle">Lead Details</div>
     <div id="leadModalContent"></div>
-    <div class="modal-footer">
-      <button class="btn btn-outline btn-sm" onclick="closeModal('leadModal')">Cancel</button>
-      <button class="btn btn-sm" onclick="saveLeadNotes()">💾 Save Changes</button>
+    <div class="modal-footer" style="justify-content:space-between;">
+      <button class="btn btn-red btn-sm" onclick="deleteLeadFromModal()">🗑 Remove Lead</button>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn btn-outline btn-sm" onclick="closeModal('leadModal')">Cancel</button>
+        <button class="btn btn-sm" onclick="saveLeadNotes()">💾 Save Changes</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1294,7 +1297,10 @@ function showLeadModal(lead) {
   html += '</select></div>';
 
   document.getElementById('leadModalContent').innerHTML = html;
+  // Force modal open with multiple methods
   modal.classList.add('active');
+  modal.style.display = 'flex';
+  modal.style.zIndex = '9999';
 }
 
 
@@ -1639,7 +1645,13 @@ function openBlockModal() {
   document.getElementById('blockModal').classList.add('active');
 }
 
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function closeModal(id) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.classList.remove('active');
+    el.style.display = '';
+  }
+}
 
 // Close modals on overlay click
 document.querySelectorAll('.modal-overlay').forEach(el => {
