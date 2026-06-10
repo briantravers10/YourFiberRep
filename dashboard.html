@@ -859,7 +859,7 @@ tr:hover td { background: var(--bg); }
           <option>Not sure – help me choose</option>
         </select>
       </div>
-      <div class="form-group"><label class="form-label">Install Date</label><input type="date" class="form-input" id="newLeadInstall"></div>
+      <div class="form-group"><label class="form-label">Call Date & Time</label><input type="datetime-local" class="form-input" id="newLeadSlot"></div>
     </div>
     <div class="form-group" style="margin-top:0.6rem;"><label class="form-label">Notes</label><textarea class="notes-area" id="newLeadNotes" placeholder="Any additional notes..." style="min-height:60px;"></textarea></div>
     <div class="modal-footer">
@@ -915,13 +915,7 @@ function load(key, def) { try { const v = localStorage.getItem('yfr_' + key); re
 const defaultUsers = [
   { username: 'brian', password: 'fiber2024', name: 'Brian', role: 'Admin' }
 ];
-const defaultLeads = [
-  { id: 1, name: 'Sarah Mitchell', phone: '(555) 210-4432', email: 'sarah.m@email.com', address: '32812 Sorrento Ln, Avon Lake OH 44012', plan: 'High-Speed Plan – 1 Gig Fiber', slot: '2026-06-05 at 10:00 AM ET', source: 'facebook', status: 'new', notes: '', followup: null, date: '2026-06-04' },
-  { id: 2, name: 'David Kowalski', phone: '(555) 338-9921', email: '', address: '591 Deer Run Ln, Avon Lake OH 44012', plan: 'Ultra-Fast Plan – 2 Gig Fiber', slot: '2026-06-05 at 2:00 PM ET', source: 'google', status: 'called', notes: 'Very interested, has 4 kids streaming at once', followup: null, date: '2026-06-03' },
-  { id: 3, name: 'Maria Gonzalez', phone: '(555) 441-7720', email: 'maria.g@gmail.com', address: '1611 Center Rd, Avon OH 44011', plan: 'Mid-Tier Plan – 500 Mbps Fiber', slot: '2026-06-06 at 11:30 AM ET', source: 'qr', status: 'signedup', notes: 'Signed up on the call. Install booked for June 10.', followup: null, date: '2026-06-02' },
-  { id: 4, name: 'Tom Bradley', phone: '(555) 882-3310', email: 'tbradley@yahoo.com', address: '32956 Webber Rd, Avon Lake OH 44012', plan: 'Not sure – help me choose', slot: '2026-06-07 at 9:00 AM ET', source: 'facebook', status: 'followup', notes: 'Wants to discuss further. Call back Thursday.', followup: '2026-06-07', date: '2026-06-03' },
-  { id: 5, name: 'Jen Carlisle', phone: '(555) 119-6644', email: '', address: '32807 Webber Rd, Avon Lake OH 44012', plan: 'Basic Plan – 200 Mbps Fiber', slot: '2026-06-04 at 3:30 PM ET', source: 'direct', status: 'notinterested', notes: 'Happy with current provider.', followup: null, date: '2026-06-01' },
-];
+const defaultLeads = [];
 const defaultZips = [
   {
     zip: '44012', city: 'Avon Lake', plans: [
@@ -1236,15 +1230,16 @@ function renderSelectedDay(dateStr) {
 function openLeadById(id) {
   var lead = null;
   for (var i = 0; i < leads.length; i++) {
-    if (leads[i].id == id) { lead = leads[i]; break; }
+    if (String(leads[i].id) === String(id)) { lead = leads[i]; break; }
   }
-  if (!lead) { alert('Lead not found'); return; }
+  if (!lead) { alert('Lead not found. ID: ' + id); return; }
   showLeadModal(lead);
 }
 
 function showLeadModal(lead) {
+  if (!lead) { alert('No lead data'); return; }
   var modal = document.getElementById('leadModal');
-  if (!modal) { alert('Modal not found'); return; }
+  if (!modal) { alert('Modal element not found in DOM'); return; }
   document.getElementById('leadModalTitle').textContent = lead.name || 'Lead Details';
   modal.dataset.leadId = lead.id;
 
@@ -1604,30 +1599,43 @@ function openAddLeadModal() {
 }
 
 function addLeadManually() {
-  const name = document.getElementById('newLeadName').value.trim();
-  const phone = document.getElementById('newLeadPhone').value.trim();
-  if (!name || !phone) { alert('Please enter at least a name and phone number.'); return; }
-  const newLead = {
-    id: Date.now(),
-    name,
-    phone,
-    email: document.getElementById('newLeadEmail').value.trim(),
-    address: document.getElementById('newLeadAddress').value.trim(),
-    plan: document.getElementById('newLeadPlan').value,
-    source: document.getElementById('newLeadSource').value,
-    status: 'new',
-    notes: document.getElementById('newLeadNotes').value.trim(),
-    installDate: document.getElementById('newLeadInstall').value,
-    slot: document.getElementById('newLeadInstall').value || '—',
-    date: new Date().toISOString().slice(0,10)
-  };
-  leads.unshift(newLead);
-  save('leads', leads);
-  renderLeads();
-  renderDashboard();
-  closeModal('addLeadModal');
-  logActivity(`Lead added manually: ${name} (${newLead.source})`);
-  checkNewLeadBadge();
+  try {
+    var name = document.getElementById('newLeadName').value.trim();
+    var phone = document.getElementById('newLeadPhone').value.trim();
+    if (!name || !phone) { alert('Please enter at least a name and phone number.'); return; }
+    var slotEl = document.getElementById('newLeadSlot');
+    var slotVal = slotEl ? slotEl.value : '';
+    var slotFormatted = '';
+    if (slotVal) {
+      var d = new Date(slotVal);
+      slotFormatted = d.toISOString().slice(0,10) + ' at ' + d.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit',hour12:true}) + ' ET';
+    }
+    var newLead = {
+      id: Date.now(),
+      name: name,
+      phone: phone,
+      email: document.getElementById('newLeadEmail').value.trim(),
+      address: document.getElementById('newLeadAddress').value.trim(),
+      plan: document.getElementById('newLeadPlan').value,
+      source: document.getElementById('newLeadSource').value,
+      status: 'new',
+      notes: document.getElementById('newLeadNotes').value.trim(),
+      installDate: '',
+      slot: slotFormatted || '—',
+      date: new Date().toISOString().slice(0,10)
+    };
+    leads.unshift(newLead);
+    save('leads', leads);
+    renderLeads();
+    renderDashboard();
+    renderCal('calGrid', 'calMonthLabel');
+    renderCal('calGrid2', 'calMonthLabel2');
+    closeModal('addLeadModal');
+    logActivity('Lead added: ' + name + ' (' + newLead.source + ')');
+    checkNewLeadBadge();
+  } catch(e) {
+    alert('Error saving lead: ' + e.message);
+  }
 }
 
 // ── LEADS TABLE ──
@@ -1655,7 +1663,7 @@ function renderLeads() {
     return;
   }
   tbody.innerHTML = filtered.map(l => `
-    <tr style="cursor:pointer;" onclick="showLeadModal(leads.find(x=>x.id==${l.id}))">
+    <tr style="cursor:pointer;" onclick="openLeadById(${l.id})">
       <td><div style="font-weight:700;">${l.name||'—'}</div><div style="font-size:0.75rem;color:var(--muted);">${l.date||''}</div></td>
       <td>${l.phone||'—'}</td>
       <td>${l.email||'—'}</td>
@@ -1694,21 +1702,61 @@ function updateLeadStatus(id, status) {
   if (!status) return;
   if (status === 'delete') {
     if (!confirm('Delete this lead? This cannot be undone.')) return;
-    leads = leads.filter(l => l.id != id);
+    leads = leads.filter(function(l) { return l.id != id; });
     save('leads', leads);
     renderLeads();
     renderDashboard();
     logActivity('Lead deleted');
     return;
   }
-  var lead = leads.find(l => l.id == id);
+  var lead = leads.find(function(l) { return l.id == id; });
   if (lead) {
     lead.status = status;
     save('leads', leads);
     renderLeads();
     renderDashboard();
     logActivity('Lead status updated: ' + lead.name + ' → ' + statusLabel(status));
+    // Trigger install date popup when signed up
+    if (status === 'signedup') {
+      document.getElementById('installLeadName').textContent = lead.name;
+      document.getElementById('installDateTime').value = '';
+      var modal = document.getElementById('installModal');
+      modal.dataset.leadId = lead.id;
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+    }
   }
+}
+
+
+function saveInstallDate() {
+  var modal = document.getElementById('installModal');
+  var leadId = modal.dataset.leadId;
+  var dateVal = document.getElementById('installDateTime').value;
+  if (!dateVal) { alert('Please select an install date and time.'); return; }
+  var lead = leads.find(function(l) { return l.id == leadId; });
+  if (lead) {
+    var d = new Date(dateVal);
+    lead.installDate = d.toISOString().slice(0,10);
+    lead.installTime = d.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit',hour12:true});
+    save('leads', leads);
+    renderLeads();
+    renderCal('calGrid', 'calMonthLabel');
+    renderCal('calGrid2', 'calMonthLabel2');
+    if (window._currentCalDate) renderSelectedDay(window._currentCalDate);
+    logActivity('Install date set for ' + lead.name + ': ' + lead.installDate + ' at ' + lead.installTime);
+  }
+  closeModal('installModal');
+}
+
+
+function clearTestLeads() {
+  if (!confirm('This will remove all leads with the name "John Smith". Continue?')) return;
+  leads = leads.filter(function(l) { return l.name !== 'John Smith'; });
+  save('leads', leads);
+  renderLeads();
+  renderDashboard();
+  alert('Test leads removed!');
 }
 
 
@@ -1742,8 +1790,41 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 
 // Auto-login from saved session
 document.addEventListener('DOMContentLoaded', function() {
+  // Clean up test leads (John Smith duplicates)
+  var stored = localStorage.getItem('yfr_leads');
+  if (stored) {
+    try {
+      var parsed = JSON.parse(stored);
+      var cleaned = parsed.filter(function(l) { return l.name !== 'John Smith'; });
+      if (cleaned.length !== parsed.length) {
+        localStorage.setItem('yfr_leads', JSON.stringify(cleaned));
+        leads = cleaned;
+      }
+    } catch(e) {}
+  }
   checkSavedSession();
 });
 </script>
+
+<!-- INSTALL DATE MODAL -->
+<div class="modal-overlay" id="installModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-title">🎉 Great — Set Install Date</div>
+    <p style="font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">Pick the install date and time for this customer. It will automatically appear on your calendar.</p>
+    <div class="form-group">
+      <label class="form-label">Customer</label>
+      <div id="installLeadName" style="font-weight:700;font-size:0.95rem;padding:0.5rem 0;"></div>
+    </div>
+    <div class="form-group" style="margin-top:0.8rem;">
+      <label class="form-label">Install Date & Time *</label>
+      <input type="datetime-local" class="form-input" id="installDateTime" style="margin-top:0.4rem;">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('installModal')">Skip for now</button>
+      <button class="btn btn-sm" onclick="saveInstallDate()">📦 Save Install Date</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
