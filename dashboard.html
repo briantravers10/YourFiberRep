@@ -626,7 +626,6 @@ tr:hover td { background: var(--bg); }
                 <th>Call Time</th>
                 <th>Source</th>
                 <th>Status</th>
-                <th>Notes</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1250,12 +1249,22 @@ function renderSelectedDay(dateStr) {
 }
 
 function openLeadById(id) {
-  var lead = null;
+  var found = null;
   for (var i = 0; i < leads.length; i++) {
-    if (String(leads[i].id) === String(id)) { lead = leads[i]; break; }
+    if (String(leads[i].id) === String(id)) { found = leads[i]; break; }
   }
-  if (!lead) { alert('Lead not found. ID: ' + id); return; }
-  showLeadModal(lead);
+  if (!found) {
+    // Try loading fresh from storage
+    var stored = localStorage.getItem('yfr_leads');
+    if (stored) {
+      var arr = JSON.parse(stored);
+      for (var j = 0; j < arr.length; j++) {
+        if (String(arr[j].id) === String(id)) { found = arr[j]; break; }
+      }
+    }
+  }
+  if (!found) { alert('Lead not found'); return; }
+  showLeadModal(found);
 }
 
 function showLeadModal(lead) {
@@ -1663,6 +1672,18 @@ function addLeadManually() {
 // -- LEADS TABLE --
 // currentLeadFilter already declared above
 // currentLeadSearch already declared above
+
+
+function statusLabel(s) {
+  var labels = {
+    new: 'New',
+    called: 'Called',
+    followup: 'Follow Up',
+    signedup: 'Signed Up',
+    notinterested: 'Not Interested'
+  };
+  return labels[s] || s || 'New';
+}
 
 function renderLeads() {
   const tbody = document.getElementById('leadsBody');
