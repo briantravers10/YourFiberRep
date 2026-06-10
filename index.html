@@ -2259,29 +2259,92 @@
   // ── BOOKING FORM ──
   function submitForm() {
     const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
     const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const address = document.getElementById('formAddress').value.trim();
+    const plan = document.getElementById('plan').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+    const slot = document.getElementById('selectedSlot') ? document.getElementById('selectedSlot').value : '';
+
     if (!firstName || !phone) {
       alert('Please enter your first name and phone number so I can give you a call!');
       return;
     }
-    const slot = document.getElementById('selectedSlot') ? document.getElementById('selectedSlot').value : '';
     if (!slot) {
       alert('Please pick a call time from the calendar so I know when to ring you!');
       return;
     }
-    console.log('New lead:', { firstName, phone, slot });
-    document.getElementById('successModal').classList.add('active');
+
+    const submitBtn = document.querySelector('.submit-btn');
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    const payload = {
+      name: firstName + (lastName ? ' ' + lastName : ''),
+      phone: phone,
+      email: email,
+      address: address,
+      plan: plan,
+      callTime: slot,
+      source: 'YourFiberRep.com',
+      status: 'New Lead',
+      notes: notes
+    };
+
+    fetch('https://script.google.com/macros/s/AKfycbzHRnM8iMFAAI5Amr6JkCiCNjMFRDY1EupwlX4KLblDb9ZVdQSpOMaGMotI0h8nCZ4z/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      document.getElementById('successModal').classList.add('active');
+      submitBtn.textContent = 'Book My Call →';
+      submitBtn.disabled = false;
+    })
+    .catch(() => {
+      document.getElementById('successModal').classList.add('active');
+      submitBtn.textContent = 'Book My Call →';
+      submitBtn.disabled = false;
+    });
   }
 
   function submitBookingForm() {
-    const firstName = document.getElementById('bFirstName').value.trim();
-    const phone = document.getElementById('bPhone').value.trim();
+    const firstName = document.getElementById('bFirstName') ? document.getElementById('bFirstName').value.trim() : '';
+    const lastName = document.getElementById('bLastName') ? document.getElementById('bLastName').value.trim() : '';
+    const phone = document.getElementById('bPhone') ? document.getElementById('bPhone').value.trim() : '';
+    const email = document.getElementById('bEmail') ? document.getElementById('bEmail').value.trim() : '';
+    const address = document.getElementById('bAddress') ? document.getElementById('bAddress').value.trim() : '';
+    const plan = document.getElementById('bPlan') ? document.getElementById('bPlan').value.trim() : '';
+    const notes = document.getElementById('bNotes') ? document.getElementById('bNotes').value.trim() : '';
+    const slot = document.getElementById('bSelectedSlot') ? document.getElementById('bSelectedSlot').value : '';
+
     if (!firstName || !phone) {
       alert('Please enter your first name and phone number so I can give you a call!');
       return;
     }
-    console.log('New lead from booking page:', { firstName, phone });
-    document.getElementById('successModal').classList.add('active');
+
+    const payload = {
+      name: firstName + (lastName ? ' ' + lastName : ''),
+      phone: phone,
+      email: email,
+      address: address,
+      plan: plan,
+      callTime: slot,
+      source: 'YourFiberRep.com',
+      status: 'New Lead',
+      notes: notes
+    };
+
+    fetch('https://script.google.com/macros/s/AKfycbzHRnM8iMFAAI5Amr6JkCiCNjMFRDY1EupwlX4KLblDb9ZVdQSpOMaGMotI0h8nCZ4z/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => { document.getElementById('successModal').classList.add('active'); })
+    .catch(() => { document.getElementById('successModal').classList.add('active'); });
   }
 
   function closeModal() {
