@@ -1763,14 +1763,43 @@ function updateLeadStatus(id, status) {
     if (status === 'signedup') {
       document.getElementById('installLeadName').textContent = lead.name;
       document.getElementById('installDateTime').value = '';
-      var modal = document.getElementById('installModal');
-      modal.dataset.leadId = lead.id;
-      modal.classList.add('active');
-      modal.style.display = 'flex';
+      var installMod = document.getElementById('installModal');
+      installMod.dataset.leadId = lead.id;
+      installMod.classList.add('active');
+      installMod.style.display = 'flex';
+    }
+    // Trigger follow-up date popup when follow up selected
+    if (status === 'followup') {
+      document.getElementById('followUpLeadName').textContent = lead.name;
+      document.getElementById('followUpDateTime').value = '';
+      var followMod = document.getElementById('followUpModal');
+      followMod.dataset.leadId = lead.id;
+      followMod.classList.add('active');
+      followMod.style.display = 'flex';
     }
   }
 }
 
+
+function saveFollowUpDate() {
+  var modal = document.getElementById('followUpModal');
+  var leadId = modal.dataset.leadId;
+  var dateVal = document.getElementById('followUpDateTime').value;
+  if (!dateVal) { alert('Please select a follow-up date and time.'); return; }
+  var lead = leads.find(function(l) { return l.id == leadId; });
+  if (lead) {
+    var d = new Date(dateVal);
+    lead.followUpDate = d.toISOString().slice(0,10);
+    lead.followUpTime = d.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit',hour12:true});
+    save('leads', leads);
+    renderLeads();
+    renderCal('calGrid', 'calMonthLabel');
+    renderCal('calGrid2', 'calMonthLabel2');
+    if (window._currentCalDate) renderSelectedDay(window._currentCalDate);
+    logActivity('Follow-up set for ' + lead.name + ': ' + lead.followUpDate + ' at ' + lead.followUpTime);
+  }
+  closeModal('followUpModal');
+}
 
 function saveInstallDate() {
   var modal = document.getElementById('installModal');
@@ -1874,6 +1903,27 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="modal-footer">
       <button class="btn btn-outline btn-sm" onclick="closeModal('installModal')">Skip for now</button>
       <button class="btn btn-sm" onclick="saveInstallDate()">📦 Save Install Date</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- FOLLOW UP DATE MODAL -->
+<div class="modal-overlay" id="followUpModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-title">📞 Set Follow-Up Call</div>
+    <p style="font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">Pick a date and time for the follow-up call. It will automatically appear on your calendar in blue.</p>
+    <div class="form-group">
+      <label class="form-label">Customer</label>
+      <div id="followUpLeadName" style="font-weight:700;font-size:0.95rem;padding:0.5rem 0;"></div>
+    </div>
+    <div class="form-group" style="margin-top:0.8rem;">
+      <label class="form-label">Follow-Up Date & Time *</label>
+      <input type="datetime-local" class="form-input" id="followUpDateTime" style="margin-top:0.4rem;">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('followUpModal')">Skip for now</button>
+      <button class="btn btn-sm" onclick="saveFollowUpDate()">📞 Save Follow-Up</button>
     </div>
   </div>
 </div>
