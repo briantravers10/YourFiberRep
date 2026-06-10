@@ -907,11 +907,11 @@ tr:hover td { background: var(--bg); }
 </div>
 
 <script>
-// ── DATA STORE (localStorage for persistence) ──
+// -- DATA STORE (localStorage for persistence) --
 function save(key, val) { try { localStorage.setItem('yfr_' + key, JSON.stringify(val)); } catch(e){} }
 function load(key, def) { try { const v = localStorage.getItem('yfr_' + key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
 
-// ── DEFAULT DATA ──
+// -- DEFAULT DATA --
 const defaultUsers = [
   { username: 'brian', password: 'fiber2024', name: 'Brian', role: 'Admin' }
 ];
@@ -919,18 +919,18 @@ const defaultLeads = [];
 const defaultZips = [
   {
     zip: '44012', city: 'Avon Lake', plans: [
-      { name: 'Basic Plan – 200 Mbps', price: '$29.99/mo', gift: 'None' },
-      { name: 'Mid-Tier Plan – 500 Mbps', price: '$39.99/mo', gift: '$150 Gift Card' },
-      { name: 'High-Speed Plan – 1 Gig', price: '$39.99/mo', gift: '$200 Gift Card' },
-      { name: 'Ultra-Fast Plan – 2 Gig', price: '$49.99/mo', gift: '$300 Gift Card' },
+      { name: 'Basic Plan - 200 Mbps', price: '$29.99/mo', gift: 'None' },
+      { name: 'Mid-Tier Plan - 500 Mbps', price: '$39.99/mo', gift: '$150 Gift Card' },
+      { name: 'High-Speed Plan - 1 Gig', price: '$39.99/mo', gift: '$200 Gift Card' },
+      { name: 'Ultra-Fast Plan - 2 Gig', price: '$49.99/mo', gift: '$300 Gift Card' },
     ],
     addresses: '32812 Sorrento Ln\n32821 Webber Rd\n32956 Webber Rd\n654 Avon Belden Rd\n591 Deer Run Ln\n32807 Webber Rd\n32811 Sorrento Ln\n32854 Rebecca Lane\n32815 Rebecca Lane\n32780 Webber Rd\n32908 Webber Rd\n32930 Fox Chappel Ln'
   },
   {
     zip: '44011', city: 'Avon', plans: [
-      { name: 'Basic Plan – 200 Mbps', price: '$29.99/mo', gift: 'None' },
-      { name: 'Mid-Tier Plan – 500 Mbps', price: '$39.99/mo', gift: '$150 Gift Card' },
-      { name: 'High-Speed Plan – 1 Gig', price: '$39.99/mo', gift: '$200 Gift Card' },
+      { name: 'Basic Plan - 200 Mbps', price: '$29.99/mo', gift: 'None' },
+      { name: 'Mid-Tier Plan - 500 Mbps', price: '$39.99/mo', gift: '$150 Gift Card' },
+      { name: 'High-Speed Plan - 1 Gig', price: '$39.99/mo', gift: '$200 Gift Card' },
     ],
     addresses: '2425 Norton Pl\n1611 Center Rd'
   }
@@ -943,12 +943,12 @@ const defaultReviews = [
 const defaultBlocks = [];
 const defaultActivity = [
   { text: 'New lead: Sarah Mitchell booked a call', time: 'Today 9:22am', user: 'System' },
-  { text: 'Lead status updated: David Kowalski → Called', time: 'Today 8:45am', user: 'Brian' },
+  { text: 'Lead status updated: David Kowalski -> Called', time: 'Today 8:45am', user: 'Brian' },
   { text: 'New lead: Tom Bradley booked a call', time: 'Yesterday 4:10pm', user: 'System' },
-  { text: 'Review approved: Sarah M. ★★★★★', time: 'Yesterday 2:30pm', user: 'Brian' },
+  { text: 'Review approved: Sarah M. *****', time: 'Yesterday 2:30pm', user: 'Brian' },
 ];
 
-// ── STATE ──
+// -- STATE --
 let currentUser = null;
 let leads = load('leads', defaultLeads);
 let zips = load('zips', defaultZips);
@@ -963,16 +963,16 @@ let calMonth = new Date().getMonth();
 let calYear = new Date().getFullYear();
 let selectedLeadId = null;
 
-// ── LOGIN ──
+// -- LOGIN --
 function togglePasswordVisibility() {
   const input = document.getElementById('loginPassword');
   const btn = document.getElementById('eyeBtn');
   if (input.type === 'password') {
     input.type = 'text';
-    btn.textContent = '🙈';
+    btn.textContent = '"&#x1F648;"';
   } else {
     input.type = 'password';
-    btn.textContent = '👁';
+    btn.textContent = 'Show';
   }
 }
 
@@ -1035,7 +1035,7 @@ function checkSavedSession() {
   return false;
 }
 
-// ── NAVIGATION ──
+// -- NAVIGATION --
 function showPage(id) {
   document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1051,7 +1051,7 @@ function showPage(id) {
   if (id === 'team') renderTeam();
 }
 
-// ── INIT ──
+// -- INIT --
 function initApp() {
   try { renderDashboard(); } catch(e) { console.error('renderDashboard error:', e); }
   try { renderCal('calGrid', 'calMonthLabel'); } catch(e) { console.error('renderCal error:', e); }
@@ -1059,7 +1059,7 @@ function initApp() {
   try { updateReviewBadge(); } catch(e) {}
 }
 
-// ── DASHBOARD ──
+// -- DASHBOARD --
 function renderDashboard() {
   const today = new Date().toISOString().slice(0,10);
   const todayLeads = leads.filter(l => l.date === today);
@@ -1080,10 +1080,10 @@ function renderDashboard() {
   } else {
     todayEl.innerHTML = todaySlots.map(l => `
       <div class="booking-item">
-        <div class="booking-time">${l.slot.split(' at ')[1] || '—'}</div>
+        <div class="booking-time">${l.slot.split(' at ')[1] || '--'}</div>
         <div>
           <div class="booking-name">${l.name}</div>
-          <div class="booking-plan">${l.plan || '—'}</div>
+          <div class="booking-plan">${l.plan || '--'}</div>
         </div>
         <div class="booking-source source-${l.source}">${l.source}</div>
       </div>`).join('');
@@ -1115,7 +1115,7 @@ function renderDashBars() {
   });
 }
 
-// ── CALENDAR ──
+// -- CALENDAR --
 function renderCal(gridId, labelId) {
   const filter = document.getElementById('calFilter') ? document.getElementById('calFilter').value : 'all';
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1193,13 +1193,13 @@ function renderSelectedDay(dateStr) {
 
   dayLeads.forEach(l => {
     html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;border:1.5px solid var(--warm);" onclick="openLeadById(${l.id})">
-      <div class="booking-time">${l.slot.split(' at ')[1] || '—'}</div>
+      <div class="booking-time">${l.slot.split(' at ')[1] || '--'}</div>
       <div style="flex:1;">
         <div class="booking-name">${l.name}</div>
-        <div class="booking-plan">${l.phone || '—'}</div>
+        <div class="booking-plan">${l.phone || '--'}</div>
       </div>
       <div class="booking-source source-${l.source}">${l.source}</div>
-      <span style="margin-left:0.5rem;color:var(--muted);">›</span>
+      <span style="margin-left:0.5rem;color:var(--muted);">></span>
     </div>`;
   });
 
@@ -1208,9 +1208,9 @@ function renderSelectedDay(dateStr) {
       <div class="booking-time" style="background:#4a6fa5;color:#fff;">FOLLOW UP</div>
       <div style="flex:1;">
         <div class="booking-name">${l.name}</div>
-        <div class="booking-plan">${l.phone || '—'}</div>
+        <div class="booking-plan">${l.phone || '--'}</div>
       </div>
-      <span style="margin-left:0.5rem;color:#4a6fa5;">›</span>
+      <span style="margin-left:0.5rem;color:#4a6fa5;">></span>
     </div>`;
   });
 
@@ -1219,16 +1219,16 @@ function renderSelectedDay(dateStr) {
       <div class="booking-time" style="background:#4caf50;color:#fff;">INSTALL</div>
       <div style="flex:1;">
         <div class="booking-name">${l.name}</div>
-        <div class="booking-plan">${l.plan || '—'}</div>
+        <div class="booking-plan">${l.plan || '--'}</div>
       </div>
-      <span style="margin-left:0.5rem;color:#4caf50;">›</span>
+      <span style="margin-left:0.5rem;color:#4caf50;">></span>
     </div>`;
   });
 
   blocked.forEach(b => {
     html += `<div class="booking-item" style="background:#fff0f0;border:1.5px solid #f0b0b0;margin-bottom:0.5rem;">
       <div class="booking-time" style="background:#fdd;color:var(--red);">BLOCKED</div>
-      <div><div class="booking-name">${b.from} — ${b.to}</div><div class="booking-plan">${b.reason || 'No reason given'}</div></div>
+      <div><div class="booking-name">${b.from} -- ${b.to}</div><div class="booking-plan">${b.reason || 'No reason given'}</div></div>
       <button class="btn btn-red btn-sm" onclick="removeBlock('${b.id}')">Remove</button>
     </div>`;
   });
@@ -1275,7 +1275,7 @@ function showLeadModal(lead) {
   fields.forEach(function(f) {
     html += '<div style="background:var(--bg);border-radius:10px;padding:0.7rem 0.9rem;">';
     html += '<div style="font-size:0.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">' + f[0] + '</div>';
-    html += '<div style="font-size:0.88rem;font-weight:700;color:var(--text);">' + (f[1] || '<span style="color:var(--muted);font-weight:400;">—</span>') + '</div>';
+    html += '<div style="font-size:0.88rem;font-weight:700;color:var(--text);">' + (f[1] || '<span style="color:var(--muted);font-weight:400;">--</span>') + '</div>';
     html += '</div>';
   });
   html += '</div>';
@@ -1310,7 +1310,7 @@ function showLeadModal(lead) {
 
 
 
-// ── ANALYTICS ──
+// -- ANALYTICS --
 function renderAnalytics() {
   const sources = ['facebook','google','qr','direct'];
   const labels = { facebook:'Facebook Ads', google:'Google Ads', qr:'QR Code / Leaflet', direct:'Direct / Other' };
@@ -1328,8 +1328,8 @@ function renderAnalytics() {
     return `<div class="analytics-card">
       <div class="analytics-source">${labels[s]}</div>
       <div class="analytics-num">${count}</div>
-      <div class="analytics-detail">${conv} signed up · ${rate}% conversion</div>
-      <div class="analytics-trend ${count > 0 ? 'trend-up' : ''}">${count > 0 ? '↑ Active' : '— No data'}</div>
+      <div class="analytics-detail">${conv} signed up . ${rate}% conversion</div>
+      <div class="analytics-trend ${count > 0 ? 'trend-up' : ''}">${count > 0 ? '^ Active' : '-- No data'}</div>
     </div>`;
   }).join('');
 
@@ -1381,8 +1381,8 @@ function filterAnalytics(period, btn) {
   renderAnalytics();
 }
 
-// ── ZIP MANAGER ──
-const allPlans = ['Basic Plan – 200 Mbps','Mid-Tier Plan – 500 Mbps','High-Speed Plan – 1 Gig','Ultra-Fast Plan – 2 Gig','Hyper-Fast Plan – 5 Gig','Ultimate Plan – 8 Gig'];
+// -- ZIP MANAGER --
+const allPlans = ['Basic Plan - 200 Mbps','Mid-Tier Plan - 500 Mbps','High-Speed Plan - 1 Gig','Ultra-Fast Plan - 2 Gig','Hyper-Fast Plan - 5 Gig','Ultimate Plan - 8 Gig'];
 
 function renderZipPlanInputs() {
   document.getElementById('zipPlanInputs').innerHTML = allPlans.map((p,i) => `
@@ -1402,7 +1402,7 @@ function addZip() {
   const plans = [];
   allPlans.forEach((p,i) => {
     if (document.getElementById('zipPlan'+i).checked) {
-      plans.push({ name: p, price: document.getElementById('zipPrice'+i).value || '—', gift: document.getElementById('zipGift'+i).value || 'None' });
+      plans.push({ name: p, price: document.getElementById('zipPrice'+i).value || '--', gift: document.getElementById('zipGift'+i).value || 'None' });
     }
   });
   zips.push({ zip, city, plans, addresses });
@@ -1420,15 +1420,15 @@ function renderZips() {
     <div class="zip-item" id="zip-item-${z.zip}">
       <div class="zip-header">
         <div>
-          <div class="zip-code">${z.zip} — ${z.city}</div>
+          <div class="zip-code">${z.zip} -- ${z.city}</div>
           <div class="zip-addresses">${(z.addresses||'').split('\n').filter(Boolean).length} addresses loaded</div>
         </div>
         <div style="display:flex;gap:0.5rem;">
-          <button class="btn btn-outline btn-sm" onclick="editZip('${z.zip}')">✏️ Edit</button>
+          <button class="btn btn-outline btn-sm" onclick="editZip('${z.zip}')"> Edit</button>
           <button class="btn btn-red btn-sm" onclick="deleteZip('${z.zip}')">Remove</button>
         </div>
       </div>
-      <div class="zip-plans">${z.plans.map(p => `<div class="zip-plan-tag">${p.name} · ${p.price}${p.gift && p.gift !== 'None' ? ' · 🎁 ' + p.gift : ''}</div>`).join('')}</div>
+      <div class="zip-plans">${z.plans.map(p => `<div class="zip-plan-tag">${p.name} . ${p.price}${p.gift && p.gift !== 'None' ? ' . [GIFT] ' + p.gift : ''}</div>`).join('')}</div>
       <div id="zip-edit-${z.zip}" style="display:none;margin-top:1rem;padding:1rem;background:var(--bg);border-radius:10px;border:1.5px solid var(--border);">
         <div class="form-row" style="margin-bottom:0.8rem;">
           <div class="form-group">
@@ -1475,7 +1475,7 @@ function saveZipEdit(zip) {
     if (document.getElementById(`edit-plan-${zip}-${i}`).checked) {
       z.plans.push({
         name: p,
-        price: document.getElementById(`edit-price-${zip}-${i}`).value || '—',
+        price: document.getElementById(`edit-price-${zip}-${i}`).value || '--',
         gift: document.getElementById(`edit-gift-${zip}-${i}`).value || 'None'
       });
     }
@@ -1492,7 +1492,7 @@ function deleteZip(zip) {
   renderZips();
 }
 
-// ── REVIEWS ──
+// -- REVIEWS --
 function renderReviews() {
   const filtered = reviews.filter(r => r.status === currentReviewFilter);
   document.getElementById('reviewList').innerHTML = filtered.length === 0
@@ -1502,14 +1502,14 @@ function renderReviews() {
         <div class="review-header">
           <div>
             <div class="review-name">${r.name}</div>
-            <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+            <div class="review-stars">${'*'.repeat(r.stars)}${'*'.repeat(5-r.stars)}</div>
           </div>
           <div class="review-date">${r.date}</div>
         </div>
         <div class="review-text">"${r.text}"</div>
         <div class="review-actions">
-          ${r.status === 'pending' ? `<button class="btn btn-sm" onclick="approveReview(${r.id})">✓ Approve</button><button class="btn btn-red btn-sm" onclick="rejectReview(${r.id})">✗ Reject</button>` : ''}
-          ${r.status === 'approved' ? `<span style="font-size:0.78rem;color:var(--accent);font-weight:800;">✓ Live on website</span>` : ''}
+          ${r.status === 'pending' ? `<button class="btn btn-sm" onclick="approveReview(${r.id})">v Approve</button><button class="btn btn-red btn-sm" onclick="rejectReview(${r.id})">X Reject</button>` : ''}
+          ${r.status === 'approved' ? `<span style="font-size:0.78rem;color:var(--accent);font-weight:800;">v Live on website</span>` : ''}
           ${r.status === 'rejected' ? `<button class="btn btn-outline btn-sm" onclick="approveReview(${r.id})">Restore</button>` : ''}
         </div>
       </div>`).join('');
@@ -1541,14 +1541,14 @@ function rejectReview(id) {
   if (r) { r.status = 'rejected'; save('reviews', reviews); renderReviews(); updateReviewBadge(); logActivity(`Review rejected: ${r.name}`); }
 }
 
-// ── TEAM ──
+// -- TEAM --
 function renderTeam() {
   document.getElementById('teamList').innerHTML = users.map(u => `
     <div class="team-item">
       <div class="team-avatar">${u.name.charAt(0)}</div>
       <div>
         <div class="team-name">${u.name}</div>
-        <div class="team-role">${u.role} · @${u.username}</div>
+        <div class="team-role">${u.role} . @${u.username}</div>
       </div>
       ${u.username !== currentUser.username ? `<button class="btn btn-red btn-sm" style="margin-left:auto;" onclick="removeMember('${u.username}')">Remove</button>` : '<div style="margin-left:auto;font-size:0.75rem;color:var(--accent);font-weight:800;">You</div>'}
     </div>`).join('') || '<div class="empty-state"><p>No team members yet.</p></div>';
@@ -1584,7 +1584,7 @@ function removeMember(username) {
   renderTeam();
 }
 
-// ── UTILITIES ──
+// -- UTILITIES --
 function logActivity(text) {
   const now = new Date();
   activity.unshift({ text, time: 'Just now', user: currentUser ? currentUser.name : 'System' });
@@ -1630,7 +1630,7 @@ function addLeadManually() {
       status: 'new',
       notes: document.getElementById('newLeadNotes').value.trim(),
       installDate: '',
-      slot: slotFormatted || '—',
+      slot: slotFormatted || '--',
       date: new Date().toISOString().slice(0,10)
     };
     leads.unshift(newLead);
@@ -1647,7 +1647,7 @@ function addLeadManually() {
   }
 }
 
-// ── LEADS TABLE ──
+// -- LEADS TABLE --
 let currentLeadFilter = 'all';
 let currentLeadSearch = '';
 
@@ -1673,13 +1673,13 @@ function renderLeads() {
   }
   tbody.innerHTML = filtered.map(l => `
     <tr style="cursor:pointer;" onclick="openLeadById(${l.id})">
-      <td><div style="font-weight:700;">${l.name||'—'}</div><div style="font-size:0.75rem;color:var(--muted);">${l.date||''}</div></td>
-      <td>${l.phone||'—'}</td>
-      <td>${l.email||'—'}</td>
-      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.address||'—'}</td>
-      <td>${l.plan||'—'}</td>
-      <td>${l.slot||'—'}</td>
-      <td><span class="booking-source source-${l.source}">${l.source||'—'}</span></td>
+      <td><div style="font-weight:700;">${l.name||'--'}</div><div style="font-size:0.75rem;color:var(--muted);">${l.date||''}</div></td>
+      <td>${l.phone||'--'}</td>
+      <td>${l.email||'--'}</td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.address||'--'}</td>
+      <td>${l.plan||'--'}</td>
+      <td>${l.slot||'--'}</td>
+      <td><span class="booking-source source-${l.source}">${l.source||'--'}</span></td>
       <td><span class="status-badge status-${l.status}">${statusLabel(l.status)}</span></td>
       <td>
         <select class="action-btn" onclick="event.stopPropagation();" onchange="updateLeadStatus(${l.id}, this.value)">
@@ -1689,7 +1689,7 @@ function renderLeads() {
           <option value="followup">Follow Up</option>
           <option value="signedup">Signed Up</option>
           <option value="notinterested">Not Interested</option>
-          <option value="delete" style="color:red;">🗑 Delete</option>
+          <option value="delete" style="color:red;">[DEL] Delete</option>
         </select>
       </td>
     </tr>`).join('');
@@ -1724,7 +1724,7 @@ function updateLeadStatus(id, status) {
     save('leads', leads);
     renderLeads();
     renderDashboard();
-    logActivity('Lead status updated: ' + lead.name + ' → ' + statusLabel(status));
+    logActivity('Lead status updated: ' + lead.name + ' -> ' + statusLabel(status));
     // Trigger install date popup when signed up
     if (status === 'signedup') {
       document.getElementById('installLeadName').textContent = lead.name;
