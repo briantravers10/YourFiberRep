@@ -1116,7 +1116,7 @@ function renderDashboard() {
 function renderDashBars() {
   const sources = { facebook: 0, google: 0, qr: 0, direct: 0 };
   leads.forEach(l => { if (sources[l.source] !== undefined) sources[l.source]++; });
-  const max = Math.max(...Object.values(sources), 1);
+  var _srcVals = Object.values(sources); var max = 1; _srcVals.forEach(function(v){if(v>max)max=v;});
   ['fb','google','qr','direct'].forEach((k, i) => {
     const src = ['facebook','google','qr','direct'][i];
     const val = sources[src];
@@ -1356,7 +1356,7 @@ function renderAnalytics() {
   }).join('');
 
   // Bar charts
-  const max = Math.max(...sources.map(s => filtered.filter(l => l.source === s).length), 1);
+  var _mv = sources.map(function(s){ return filtered.filter(function(l){ return l.source === s; }).length; }); var max = 1; _mv.forEach(function(v){if(v>max)max=v;});
   document.getElementById('analyticsBarChart').innerHTML = sources.map(s => {
     const count = filtered.filter(l => l.source === s).length;
     return `<div class="bar-row">
@@ -1366,11 +1366,11 @@ function renderAnalytics() {
     </div>`;
   }).join('');
 
-  const maxConv = Math.max(...sources.map(s => {
-    const c = filtered.filter(l => l.source === s).length;
-    const sv = filtered.filter(l => l.source === s && l.status === 'signedup').length;
+  var _convVals = sources.map(function(s) {
+    var c = filtered.filter(function(l){ return l.source === s; }).length;
+    var sv = filtered.filter(function(l){ return l.source === s && l.status === 'signedup'; }).length;
     return c > 0 ? Math.round(sv/c*100) : 0;
-  }), 1);
+  }); maxConv = 1; _convVals.forEach(function(v){ if(v>maxConv) maxConv=v; });
   document.getElementById('conversionChart').innerHTML = sources.map(s => {
     const c = filtered.filter(l => l.source === s).length;
     const sv = filtered.filter(l => l.source === s && l.status === 'signedup').length;
@@ -1919,7 +1919,7 @@ function renderBlockedList() {
 function exportLeads() {
   const headers = ['Name','Phone','Email','Address','Plan','Call Time','Source','Status','Notes','Date'];
   const rows = leads.map(l => [l.name, l.phone||'', l.email||'', l.address||'', l.plan||'', l.slot||'', l.source, statusLabel(l.status), l.notes||'', l.date]);
-  const csv = [headers, ...rows].map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  var allRows = [headers].concat(rows); var csv = allRows.map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'yourfiberrep-leads.csv'; a.click();
