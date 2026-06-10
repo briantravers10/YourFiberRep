@@ -1909,7 +1909,7 @@ function renderBlockedList() {
     return '<div class="booking-item" style="margin-bottom:0.4rem;background:#fff0f0;border:1px solid #f0b0b0;">' +
       '<div class="booking-time" style="background:#fdd;color:var(--red);font-size:0.72rem;">BLOCKED</div>' +
       '<div style="flex:1;font-size:0.8rem;"><strong>' + b.date + '</strong> ' + b.from + '-' + b.to +
-      (b.reason ? ' — ' + b.reason : '') + '</div>' +
+      (b.reason ? ' -- ' + b.reason : '') + '</div>' +
       '<button class="btn btn-red btn-sm" style="font-size:0.72rem;padding:0.2rem 0.6rem;" onclick="removeBlock('' + b.id + '')">Remove</button>' +
       '</div>';
   }).join('');
