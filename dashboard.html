@@ -1847,9 +1847,34 @@ function exportLeads() {
   logActivity('Leads exported to CSV');
 }
 
+
+function renderBlockSelects() {
+  var selects = ['blockFromModal', 'blockToModal', 'blockFrom', 'blockTo'];
+  selects.forEach(function(id) {
+    var sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '';
+    for (var h = 0; h < 24; h++) {
+      for (var m = 0; m < 60; m += 30) {
+        var hh = h.toString().padStart(2, '0');
+        var mm = m.toString().padStart(2, '0');
+        var h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+        var ampm = h >= 12 ? 'PM' : 'AM';
+        var label = h12 + ':' + mm + ' ' + ampm;
+        var opt = document.createElement('option');
+        opt.value = hh + ':' + mm;
+        opt.textContent = label;
+        sel.appendChild(opt);
+      }
+    }
+  });
+}
+
 function openBlockModal() {
   renderBlockSelects();
-  document.getElementById('blockModal').classList.add('active');
+  var modal = document.getElementById('blockModal');
+  modal.classList.add('active');
+  modal.style.display = 'flex';
 }
 
 function closeModal(id) {
