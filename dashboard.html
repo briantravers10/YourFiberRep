@@ -1756,27 +1756,32 @@ function updateLeadStatus(id, status) {
   if (lead) {
     lead.status = status;
     save('leads', leads);
-    renderLeads();
-    renderDashboard();
     logActivity('Lead status updated: ' + lead.name + ' -> ' + statusLabel(status));
-    // Trigger install date popup when signed up
+    // Show popups BEFORE re-rendering so they aren't destroyed
     if (status === 'signedup') {
+      renderLeads();
+      renderDashboard();
       document.getElementById('installLeadName').textContent = lead.name;
       document.getElementById('installDateTime').value = '';
       var installMod = document.getElementById('installModal');
-      installMod.dataset.leadId = lead.id;
+      installMod.dataset.leadId = String(lead.id);
       installMod.classList.add('active');
       installMod.style.display = 'flex';
+      return;
     }
-    // Trigger follow-up date popup when follow up selected
     if (status === 'followup') {
+      renderLeads();
+      renderDashboard();
       document.getElementById('followUpLeadName').textContent = lead.name;
       document.getElementById('followUpDateTime').value = '';
       var followMod = document.getElementById('followUpModal');
-      followMod.dataset.leadId = lead.id;
+      followMod.dataset.leadId = String(lead.id);
       followMod.classList.add('active');
       followMod.style.display = 'flex';
+      return;
     }
+    renderLeads();
+    renderDashboard();
   }
 }
 
