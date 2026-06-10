@@ -864,7 +864,7 @@ tr:hover td { background: var(--bg); }
     <div class="form-group" style="margin-top:0.6rem;"><label class="form-label">Notes</label><textarea class="notes-area" id="newLeadNotes" placeholder="Any additional notes..." style="min-height:60px;"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-outline btn-sm" onclick="closeModal('addLeadModal')">Cancel</button>
-      <button class="btn btn-sm" onclick="addLeadManually()">Add Lead</button>
+      <button class="btn btn-sm" onclick="this.disabled=true;addLeadManually();setTimeout(()=>this.disabled=false,2000)">Add Lead</button>
     </div>
   </div>
 </div>
@@ -1058,6 +1058,17 @@ function initApp() {
   try { renderCal('calGrid', 'calMonthLabel'); } catch(e) { console.error('renderCal error:', e); }
   try { checkNewLeadBadge(); } catch(e) {}
   try { updateReviewBadge(); } catch(e) {}
+  // Event delegation for calendar lead cards
+  var calContent = document.getElementById('selectedDayContent');
+  if (calContent) {
+    calContent.addEventListener('click', function(e) {
+      var card = e.target.closest('[data-leadid]');
+      if (card) {
+        var id = card.getAttribute('data-leadid');
+        openLeadById(id);
+      }
+    });
+  }
 }
 
 // -- DASHBOARD --
@@ -1193,36 +1204,36 @@ function renderSelectedDay(dateStr) {
   }
 
   dayLeads.forEach(l => {
-    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;border:1.5px solid var(--warm);" onclick="openLeadById(${l.id})">
-      <div class="booking-time">${l.slot.split(' at ')[1] || '--'}</div>
-      <div style="flex:1;">
+    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;border:1.5px solid var(--warm);" data-leadid="${l.id}" onclick="openLeadById(${l.id})">
+      <div class="booking-time" style="pointer-events:none;">${l.slot.split(' at ')[1] || '--'}</div>
+      <div style="flex:1;pointer-events:none;">
         <div class="booking-name">${l.name}</div>
         <div class="booking-plan">${l.phone || '--'}</div>
       </div>
-      <div class="booking-source source-${l.source}">${l.source}</div>
-      <span style="margin-left:0.5rem;color:var(--muted);">></span>
+      <div class="booking-source source-${l.source}" style="pointer-events:none;">${l.source}</div>
+      <span style="margin-left:0.5rem;color:var(--muted);pointer-events:none;">></span>
     </div>`;
   });
 
   followUps.forEach(l => {
-    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border:1.5px solid #4a6fa5;" onclick="openLeadById(${l.id})">
-      <div class="booking-time" style="background:#4a6fa5;color:#fff;">FOLLOW UP</div>
-      <div style="flex:1;">
+    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;background:#eef3ff;border:1.5px solid #4a6fa5;" data-leadid="${l.id}" onclick="openLeadById(${l.id})">
+      <div class="booking-time" style="background:#4a6fa5;color:#fff;pointer-events:none;">FOLLOW UP</div>
+      <div style="flex:1;pointer-events:none;">
         <div class="booking-name">${l.name}</div>
         <div class="booking-plan">${l.phone || '--'}</div>
       </div>
-      <span style="margin-left:0.5rem;color:#4a6fa5;">></span>
+      <span style="margin-left:0.5rem;color:#4a6fa5;pointer-events:none;">></span>
     </div>`;
   });
 
   installs.forEach(l => {
-    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;background:#e8f5e9;border:1.5px solid #4caf50;" onclick="openLeadById(${l.id})">
-      <div class="booking-time" style="background:#4caf50;color:#fff;">INSTALL</div>
-      <div style="flex:1;">
+    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;background:#e8f5e9;border:1.5px solid #4caf50;" data-leadid="${l.id}" onclick="openLeadById(${l.id})">
+      <div class="booking-time" style="background:#4caf50;color:#fff;pointer-events:none;">INSTALL</div>
+      <div style="flex:1;pointer-events:none;">
         <div class="booking-name">${l.name}</div>
         <div class="booking-plan">${l.plan || '--'}</div>
       </div>
-      <span style="margin-left:0.5rem;color:#4caf50;">></span>
+      <span style="margin-left:0.5rem;color:#4caf50;pointer-events:none;">></span>
     </div>`;
   });
 
@@ -1234,7 +1245,8 @@ function renderSelectedDay(dateStr) {
     </div>`;
   });
 
-  document.getElementById('selectedDayContent').innerHTML = html;
+  var container = document.getElementById('selectedDayContent');
+  container.innerHTML = html;
 }
 
 function openLeadById(id) {
@@ -1800,12 +1812,21 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 
 // Auto-login from saved session
 document.addEventListener('DOMContentLoaded', function() {
-  // Clean up test leads (John Smith duplicates)
+  // Clean up test leads and duplicates
   var stored = localStorage.getItem('yfr_leads');
   if (stored) {
     try {
       var parsed = JSON.parse(stored);
+      // Remove John Smith test entries
       var cleaned = parsed.filter(function(l) { return l.name !== 'John Smith'; });
+      // Remove duplicate entries (same name + same slot)
+      var seen = {};
+      cleaned = cleaned.filter(function(l) {
+        var key = (l.name || '') + '|' + (l.slot || '') + '|' + (l.date || '');
+        if (seen[key]) return false;
+        seen[key] = true;
+        return true;
+      });
       if (cleaned.length !== parsed.length) {
         localStorage.setItem('yfr_leads', JSON.stringify(cleaned));
         leads = cleaned;
