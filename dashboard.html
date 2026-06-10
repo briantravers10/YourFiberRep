@@ -947,6 +947,28 @@ const defaultActivity = [
   { text: 'Review approved: Sarah M. *****', time: 'Yesterday 2:30pm', user: 'Brian' },
 ];
 
+// -- GOOGLE SHEETS API --
+const SHEETS_API = 'https://script.google.com/macros/s/AKfycbzJh5Wxu71sCu5ki6qvUsXU2EUZ6FQ1xmaY9YyxAnBmVYfURgWtYR34pt9ZQ_EDT5AW/exec';
+
+async function loadLeadsFromSheets() {
+  try {
+    const res = await fetch(SHEETS_API + '?action=get');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        leads = data;
+        save('leads', leads);
+        renderLeads();
+        renderDashboard();
+        renderCal('calGrid', 'calMonthLabel');
+        if (document.getElementById('calGrid2')) renderCal('calGrid2', 'calMonthLabel2');
+      }
+    }
+  } catch(e) {
+    console.log('Sheets fetch failed, using cached leads:', e.message);
+  }
+}
+
 // -- STATE --
 let currentUser = null;
 let leads = load('leads', defaultLeads);
@@ -1043,7 +1065,7 @@ function showPage(id) {
   document.getElementById('nav-' + id).classList.add('active');
   const titles = { dashboard:'Dashboard', leads:'All Leads', calendar:'Calendar', analytics:'Analytics', zipmanager:'Zip Manager', reviews:'Reviews', team:'Team' };
   document.getElementById('topbarTitle').textContent = titles[id] || id;
-  if (id === 'leads') renderLeads();
+  if (id === 'leads') { loadLeadsFromSheets(); renderLeads(); }
   if (id === 'analytics') renderAnalytics();
   if (id === 'calendar') { renderCal('calGrid2', 'calMonthLabel2'); renderBlockSelects(); renderBlockedList(); }
   if (id === 'zipmanager') { renderZips(); renderZipPlanInputs(); }
@@ -1053,6 +1075,7 @@ function showPage(id) {
 
 // -- INIT --
 function initApp() {
+  loadLeadsFromSheets();
   try { renderDashboard(); } catch(e) { console.error('renderDashboard error:', e); }
   try { renderCal('calGrid', 'calMonthLabel'); } catch(e) { console.error('renderCal error:', e); }
   try { checkNewLeadBadge(); } catch(e) {}
