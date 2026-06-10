@@ -1837,6 +1837,85 @@ function clearTestLeads() {
 }
 
 
+function addBlockFromModal() {
+  var dateStart = document.getElementById('blockDateModal') ? document.getElementById('blockDateModal').value : '';
+  var dateEnd = document.getElementById('blockDateEndModal') ? document.getElementById('blockDateEndModal').value : dateStart;
+  var fromVal = document.getElementById('blockFromModal') ? document.getElementById('blockFromModal').value : '00:00';
+  var toVal = document.getElementById('blockToModal') ? document.getElementById('blockToModal').value : '23:30';
+  var reason = document.getElementById('blockReasonModal') ? document.getElementById('blockReasonModal').value : '';
+  if (!dateStart) { alert('Please select a start date.'); return; }
+  if (!dateEnd) dateEnd = dateStart;
+  // Add a block for each day in range
+  var start = new Date(dateStart + 'T12:00:00');
+  var end = new Date(dateEnd + 'T12:00:00');
+  var d = new Date(start);
+  while (d <= end) {
+    var dateStr = d.toISOString().slice(0,10);
+    blocks.push({ id: String(Date.now()) + String(Math.random()).slice(2,6), date: dateStr, from: fromVal, to: toVal, reason: reason });
+    d.setDate(d.getDate() + 1);
+  }
+  save('blocks', blocks);
+  closeModal('blockModal');
+  renderCal('calGrid', 'calMonthLabel');
+  renderCal('calGrid2', 'calMonthLabel2');
+  if (window._currentCalDate) renderSelectedDay(window._currentCalDate);
+  var rangeLabel = dateStart === dateEnd ? dateStart : dateStart + ' to ' + dateEnd;
+  logActivity('Time blocked: ' + rangeLabel + ' ' + fromVal + '-' + toVal);
+}
+
+function addBlock() {
+  var dateStart = document.getElementById('blockDate') ? document.getElementById('blockDate').value : '';
+  var dateEnd = document.getElementById('blockDateEnd') ? document.getElementById('blockDateEnd').value : dateStart;
+  var fromVal = document.getElementById('blockFrom') ? document.getElementById('blockFrom').value : '00:00';
+  var toVal = document.getElementById('blockTo') ? document.getElementById('blockTo').value : '23:30';
+  var reason = document.getElementById('blockReason') ? document.getElementById('blockReason').value : '';
+  if (!dateStart) { alert('Please select a start date.'); return; }
+  if (!dateEnd) dateEnd = dateStart;
+  var start = new Date(dateStart + 'T12:00:00');
+  var end = new Date(dateEnd + 'T12:00:00');
+  var d = new Date(start);
+  while (d <= end) {
+    var dateStr = d.toISOString().slice(0,10);
+    blocks.push({ id: String(Date.now()) + String(Math.random()).slice(2,6), date: dateStr, from: fromVal, to: toVal, reason: reason });
+    d.setDate(d.getDate() + 1);
+  }
+  save('blocks', blocks);
+  renderCal('calGrid', 'calMonthLabel');
+  renderCal('calGrid2', 'calMonthLabel2');
+  renderBlockedList();
+  if (window._currentCalDate) renderSelectedDay(window._currentCalDate);
+  var rangeLabel = dateStart === dateEnd ? dateStart : dateStart + ' to ' + dateEnd;
+  logActivity('Time blocked: ' + rangeLabel);
+}
+
+function removeBlock(id) {
+  blocks = blocks.filter(function(b) { return b.id !== id; });
+  save('blocks', blocks);
+  renderCal('calGrid', 'calMonthLabel');
+  renderCal('calGrid2', 'calMonthLabel2');
+  renderBlockedList();
+  if (window._currentCalDate) renderSelectedDay(window._currentCalDate);
+  logActivity('Block removed');
+}
+
+function renderBlockedList() {
+  var list = document.getElementById('blockedList');
+  if (!list) return;
+  if (blocks.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;">No blocked times.</p>';
+    return;
+  }
+  list.innerHTML = blocks.map(function(b) {
+    return '<div class="booking-item" style="margin-bottom:0.4rem;background:#fff0f0;border:1px solid #f0b0b0;">' +
+      '<div class="booking-time" style="background:#fdd;color:var(--red);font-size:0.72rem;">BLOCKED</div>' +
+      '<div style="flex:1;font-size:0.8rem;"><strong>' + b.date + '</strong> ' + b.from + '-' + b.to +
+      (b.reason ? ' — ' + b.reason : '') + '</div>' +
+      '<button class="btn btn-red btn-sm" style="font-size:0.72rem;padding:0.2rem 0.6rem;" onclick="removeBlock('' + b.id + '')">Remove</button>' +
+      '</div>';
+  }).join('');
+}
+
+
 function exportLeads() {
   const headers = ['Name','Phone','Email','Address','Plan','Call Time','Source','Status','Notes','Date'];
   const rows = leads.map(l => [l.name, l.phone||'', l.email||'', l.address||'', l.plan||'', l.slot||'', l.source, statusLabel(l.status), l.notes||'', l.date]);
