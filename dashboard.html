@@ -996,12 +996,21 @@ function doLogin() {
 }
 
 function showApp(user) {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('app').classList.add('active');
-  document.getElementById('sidebarUser').textContent = user.role;
-  document.getElementById('footerUser').textContent = user.name;
-  document.getElementById('loginError').style.display = 'none';
-  initApp();
+  try {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('active');
+    var sidebarUser = document.getElementById('sidebarUser');
+    if (sidebarUser) sidebarUser.textContent = user.role;
+    var footerUser = document.getElementById('footerUser');
+    if (footerUser) footerUser.textContent = user.name;
+    var loginError = document.getElementById('loginError');
+    if (loginError) loginError.style.display = 'none';
+    initApp();
+  } catch(e) {
+    console.error('showApp error:', e);
+    // Still show the app even if something errors
+    document.getElementById('app').classList.add('active');
+  }
 }
 
 function doLogout() {
@@ -1044,10 +1053,10 @@ function showPage(id) {
 
 // ── INIT ──
 function initApp() {
-  renderDashboard();
-  renderCal('calGrid', 'calMonthLabel');
-  checkNewLeadBadge();
-  updateReviewBadge();
+  try { renderDashboard(); } catch(e) { console.error('renderDashboard error:', e); }
+  try { renderCal('calGrid', 'calMonthLabel'); } catch(e) { console.error('renderCal error:', e); }
+  try { checkNewLeadBadge(); } catch(e) {}
+  try { updateReviewBadge(); } catch(e) {}
 }
 
 // ── DASHBOARD ──
