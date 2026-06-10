@@ -2255,12 +2255,9 @@
       notes: notes
     };
 
-    fetch('https://script.google.com/macros/s/AKfycbzHRnM8iMFAAI5Amr6JkCiCNjMFRDY1EupwlX4KLblDb9ZVdQSpOMaGMotI0h8nCZ4z/exec', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
+    const params = new URLSearchParams(payload).toString();
+    const url = 'https://script.google.com/macros/s/AKfycbzuU4vUdLwKfP_YQk3qFKhbDn1pKlNDvyf25vtlatb8g1A3aExycZUX8lnZaNSRTTjQ/exec?' + params;
+    fetch(url, { method: 'GET', mode: 'no-cors' })
     .then(() => {
       document.getElementById('successModal').classList.add('active');
       submitBtn.textContent = 'Book My Call →';
@@ -2300,12 +2297,9 @@
       notes: notes
     };
 
-    fetch('https://script.google.com/macros/s/AKfycbzHRnM8iMFAAI5Amr6JkCiCNjMFRDY1EupwlX4KLblDb9ZVdQSpOMaGMotI0h8nCZ4z/exec', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
+    const params = new URLSearchParams(payload).toString();
+    const url = 'https://script.google.com/macros/s/AKfycbzuU4vUdLwKfP_YQk3qFKhbDn1pKlNDvyf25vtlatb8g1A3aExycZUX8lnZaNSRTTjQ/exec?' + params;
+    fetch(url, { method: 'GET', mode: 'no-cors' })
     .then(() => { document.getElementById('successModal').classList.add('active'); })
     .catch(() => { document.getElementById('successModal').classList.add('active'); });
   }
