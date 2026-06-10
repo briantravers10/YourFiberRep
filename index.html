@@ -2260,6 +2260,13 @@
     fetch(url, { method: 'GET', mode: 'no-cors' })
     .then(() => {
       document.getElementById('successModal').classList.add('active');
+      ['firstName','lastName','phone','email','formAddress','notes'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
+      const planEl = document.getElementById('plan'); if (planEl) planEl.value = '';
+      const slotEl = document.getElementById('selectedSlot'); if (slotEl) slotEl.value = '';
+      const confirmEl = document.getElementById('calConfirmStep'); if (confirmEl) confirmEl.style.display = 'none';
+      buildDayGrid('dayGrid', 'timeStepInForm', 'timeGrid', 'calConfirmStep', 'calSelectedTime', 'selectedSlot');
       submitBtn.textContent = 'Book My Call →';
       submitBtn.disabled = false;
     })
@@ -2297,12 +2304,32 @@
       notes: notes
     };
 
+    const bookBtn = document.querySelector('#page-booking .submit-btn');
+    if (bookBtn) { bookBtn.textContent = 'Sending...'; bookBtn.disabled = true; }
+
     const params = new URLSearchParams(payload).toString();
     const url = 'https://script.google.com/macros/s/AKfycbzuU4vUdLwKfP_YQk3qFKhbDn1pKlNDvyf25vtlatb8g1A3aExycZUX8lnZaNSRTTjQ/exec?' + params;
     fetch(url, { method: 'GET', mode: 'no-cors' })
-    .then(() => { document.getElementById('successModal').classList.add('active'); })
-    .catch(() => { document.getElementById('successModal').classList.add('active'); });
+    .then(() => {
+      document.getElementById('successModal').classList.add('active');
+      ['bFirstName','bLastName','bPhone','bEmail','bAddress','bNotes'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
+      const planEl = document.getElementById('bPlan'); if (planEl) planEl.value = '';
+      const slotEl = document.getElementById('selectedSlot2'); if (slotEl) slotEl.value = '';
+      const confirmEl = document.getElementById('calConfirmStep2'); if (confirmEl) confirmEl.style.display = 'none';
+      buildDayGrid('dayGrid2', 'timeStepInForm2', 'timeGrid2', 'calConfirmStep2', 'calSelectedTime2', 'selectedSlot2');
+      if (bookBtn) { bookBtn.textContent = 'Book My Call \u2192'; bookBtn.disabled = false; }
+    })
+    .catch(() => {
+      document.getElementById('successModal').classList.add('active');
+      if (bookBtn) { bookBtn.textContent = 'Book My Call \u2192'; bookBtn.disabled = false; }
+    });
   }
+
+
+
+
 
   function closeModal() {
     document.getElementById('successModal').classList.remove('active');
