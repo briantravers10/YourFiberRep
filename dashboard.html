@@ -176,7 +176,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 }
 .cal-day:hover { background: var(--accent-light); }
 .cal-day.today { background: var(--accent); color: var(--white); }
-.cal-day.has-booking { background: var(--warm-light); border: 1.5px solid var(--warm); color: var(--text); }
+.cal-day.has-booking { background: #ffe8e8; border: 1.5px solid #d93025; color: #d93025; font-weight: 700; }
   .has-followup { background: #eef3ff; border: 1.5px solid #4a6fa5; color: #4a6fa5; font-weight: 700; }
   .has-install { background: #e8f5e9; border: 1.5px solid #4caf50; color: #2e7d32; font-weight: 700; }
   .cal-lead-card { transition: box-shadow 0.15s, transform 0.15s; }
@@ -1152,7 +1152,7 @@ function renderCal(gridId, labelId) {
     else if (hasFollowUp) cls += ' has-followup';
     else if (hasInstall) cls += ' has-install';
     let dots = '';
-    if (hasBooking && !isToday) dots += '<div class="cal-dot"></div>';
+    if (hasBooking && !isToday) dots += '<div class="cal-dot" style="background:#d93025;"></div>';
     if (hasFollowUp && !isToday) dots += '<div class="cal-dot" style="background:#4a6fa5;"></div>';
     if (hasInstall && !isToday) dots += '<div class="cal-dot" style="background:#4caf50;"></div>';
     html += `<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${dots}</div>`;
@@ -1203,8 +1203,8 @@ function renderSelectedDay(dateStr) {
   }
 
   dayLeads.forEach(l => {
-    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;border:1.5px solid var(--warm);" data-leadid="${l.id}" onclick="openLeadById(${l.id})">
-      <div class="booking-time" style="pointer-events:none;">${l.slot.split(' at ')[1] || '--'}</div>
+    html += `<div class="booking-item" style="margin-bottom:0.5rem;cursor:pointer;border:1.5px solid #d93025;background:#fff8f8;" data-leadid="${l.id}" onclick="openLeadById(${l.id})">
+      <div class="booking-time" style="pointer-events:none;background:#d93025;color:#fff;">${l.slot.split(' at ')[1] || '--'}</div>
       <div style="flex:1;pointer-events:none;">
         <div class="booking-name">${l.name}</div>
         <div class="booking-plan">${l.phone || '--'}</div>
