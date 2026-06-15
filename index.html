@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WR9DXDHT0E"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-WR9DXDHT0E');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YourFiberRep — Your Local Brightspeed Rep</title>
@@ -2107,37 +2116,50 @@
   }, 4000);
 
   // ── ADDRESS DATA ──
-  const eligibleAddresses = [
-    { match: ["32812", "sorrento"], zip: "44012", city: "Avon Lake" },
-    { match: ["32821", "webber"], zip: "44012", city: "Avon Lake" },
-    { match: ["32956", "webber"], zip: "44012", city: "Avon Lake" },
-    { match: ["654", "avon belden"], zip: "44012", city: "Avon Lake" },
-    { match: ["591", "deer run"], zip: "44012", city: "Avon Lake" },
-    { match: ["32807", "webber"], zip: "44012", city: "Avon Lake" },
-    { match: ["32811", "sorrento"], zip: "44012", city: "Avon Lake" },
-    { match: ["32854", "rebecca"], zip: "44012", city: "Avon Lake" },
-    { match: ["32815", "rebecca"], zip: "44012", city: "Avon Lake" },
-    { match: ["32780", "webber"], zip: "44012", city: "Avon Lake" },
-    { match: ["32908", "webber"], zip: "44012", city: "Avon Lake" },
-    { match: ["32930", "fox chappel"], zip: "44012", city: "Avon Lake" },
-    { match: ["2425", "norton"], zip: "44011", city: "Avon" },
-    { match: ["1611", "center"], zip: "44011", city: "Avon" },
-  ];
+  let eligibleAddresses = [];
+  let pricingData = [];
 
-  const standardPlans = [
-    { name: "Basic Plan", speed: "200 Mbps Fiber", price: "$29.99/mo", gift: null },
-    { name: "Mid-Tier Plan", speed: "500 Mbps Fiber", price: "$39.99/mo", gift: "$150 Visa Gift Card" },
-    { name: "High-Speed Plan", speed: "1 Gig Fiber", price: "$39.99/mo", gift: "$200 Visa Gift Card" },
-    { name: "Ultra-Fast Plan", speed: "2 Gig Fiber", price: "$49.99/mo", gift: "$300 Visa Gift Card" },
-    { name: "Hyper-Fast Plan", speed: "5 Gig Fiber - subject to address availability", price: "$79.99/mo", gift: "$300 Visa Gift Card" },
-    { name: "Ultimate Plan", speed: "8 Gig Fiber - subject to address availability", price: "$109.99/mo", gift: "$300 Visa Gift Card" }
-  ];
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz4wmnj-1J9Ol_E191qkiExwkp5pT66gAN1VL6b5YLX_1LAMnRUzJuwqFL4lcYO-s2O/exec';
+
+  function loadSheetData() {
+    // Load addresses
+    fetch(SHEETS_URL + '?action=getAddresses')
+      .then(r => r.json())
+      .then(data => {
+        eligibleAddresses = data.map(a => {
+          const parts = a.address.trim().split(' ');
+          const num = parts[0].toLowerCase();
+          const street = parts.slice(1).join(' ').toLowerCase();
+          return { match: [num, street], zip: a.zip, city: a.city, fullAddress: a.address };
+        });
+      })
+      .catch(() => { console.log('Address fetch failed'); });
+
+    // Load pricing
+    fetch(SHEETS_URL + '?action=getPricing')
+      .then(r => r.json())
+      .then(data => { pricingData = data; })
+      .catch(() => { console.log('Pricing fetch failed'); });
+  }
+
+  loadSheetData();
 
   function findAddress(input) {
-    const lower = input.toLowerCase();
+    const lower = input.toLowerCase().replace(/,/g, ' ').replace(/  +/g, ' ');
     return eligibleAddresses.find(a =>
       a.match.every(fragment => lower.includes(fragment.toLowerCase()))
     );
+  }
+
+  function getPlansByZip(zip) {
+    const zipPlans = pricingData.filter(p => p.zip === zip);
+    if (zipPlans.length === 0) return standardPlans;
+    return zipPlans.map(p => ({
+      name: p.plan,
+      speed: p.plan,
+      price: p.price,
+      gift: p.gift && p.gift !== 'None' ? p.gift : null
+    }));
   }
 
   // ── ADDRESS CHECKER ──
@@ -2172,7 +2194,7 @@
       result.innerHTML = `✓ Great news! Brightspeed Fiber is available at your address in ${found.city}, OH ${found.zip}. Here are your plan options:`;
       const formAddr = document.getElementById('formAddress');
       if (formAddr) formAddr.value = input;
-      pricing.innerHTML = buildPricingHTML({ plans: standardPlans }, 'selectPlan');
+      pricing.innerHTML = buildPricingHTML({ plans: getPlansByZip(found.zip) }, 'selectPlan');
       pricing.style.display = 'block';
     } else {
       result.className = 'checker-result result-unavailable';
@@ -2191,7 +2213,7 @@
     if (found) {
       result.className = 'checker-result result-available';
       result.innerHTML = `✓ Great news! Brightspeed Fiber is available at your address in ${found.city}, OH ${found.zip}. Here are your plan options:`;
-      pricing.innerHTML = buildPricingHTML({ plans: standardPlans }, 'selectPlanAndBook');
+      pricing.innerHTML = buildPricingHTML({ plans: getPlansByZip(found.zip) }, 'selectPlanAndBook');
       pricing.style.display = 'block';
     } else {
       result.className = 'checker-result result-unavailable';
@@ -2256,7 +2278,7 @@
     };
 
     const params = new URLSearchParams(payload).toString();
-    const url = 'https://script.google.com/macros/s/AKfycbylH1qRbwyZx8G65_nPf0AOPHyy8Q0snLjLKh_M39BeZ4zEYy36YTJjUx0EE-v-x4JF/exec?' + params;
+    const url = 'https://script.google.com/macros/s/AKfycbz4wmnj-1J9Ol_E191qkiExwkp5pT66gAN1VL6b5YLX_1LAMnRUzJuwqFL4lcYO-s2O/exec?' + params;
     fetch(url, { method: 'GET', mode: 'no-cors' })
     .then(() => {
       document.getElementById('successModal').classList.add('active');
@@ -2308,7 +2330,7 @@
     if (bookBtn) { bookBtn.textContent = 'Sending...'; bookBtn.disabled = true; }
 
     const params = new URLSearchParams(payload).toString();
-    const url = 'https://script.google.com/macros/s/AKfycbylH1qRbwyZx8G65_nPf0AOPHyy8Q0snLjLKh_M39BeZ4zEYy36YTJjUx0EE-v-x4JF/exec?' + params;
+    const url = 'https://script.google.com/macros/s/AKfycbz4wmnj-1J9Ol_E191qkiExwkp5pT66gAN1VL6b5YLX_1LAMnRUzJuwqFL4lcYO-s2O/exec?' + params;
     fetch(url, { method: 'GET', mode: 'no-cors' })
     .then(() => {
       document.getElementById('successModal').classList.add('active');
