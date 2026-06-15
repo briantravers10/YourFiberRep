@@ -948,7 +948,7 @@ const defaultActivity = [
 ];
 
 // -- GOOGLE SHEETS API --
-const SHEETS_API = 'https://script.google.com/macros/s/AKfycbz4wmnj-1J9Ol_E191qkiExwkp5pT66gAN1VL6b5YLX_1LAMnRUzJuwqFL4lcYO-s2O/exec';
+const SHEETS_API = 'https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec';
 
 async function loadLeadsFromSheets() {
   try {
@@ -1069,13 +1069,14 @@ function showPage(id) {
   if (id === 'analytics') renderAnalytics();
   if (id === 'calendar') { renderCal('calGrid2', 'calMonthLabel2'); renderBlockSelects(); renderBlockedList(); }
   if (id === 'zipmanager') { renderZips(); renderZipPlanInputs(); }
-  if (id === 'reviews') renderReviews();
+  if (id === 'reviews') loadSheetReviews();
   if (id === 'team') renderTeam();
 }
 
 // -- INIT --
 function initApp() {
   loadLeadsFromSheets();
+  loadSheetReviews();
   try { renderDashboard(); } catch(e) { console.error('renderDashboard error:', e); }
   try { renderCal('calGrid', 'calMonthLabel'); } catch(e) { console.error('renderCal error:', e); }
   try { checkNewLeadBadge(); } catch(e) {}
@@ -1538,8 +1539,21 @@ function deleteZip(zip) {
 }
 
 // -- REVIEWS --
+let sheetReviews = [];
+
+function loadSheetReviews() {
+  fetch('https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?action=getReviews')
+    .then(r => r.json())
+    .then(data => {
+      sheetReviews = data;
+      renderReviews();
+      updateReviewBadge();
+    })
+    .catch(() => {});
+}
+
 function renderReviews() {
-  const filtered = reviews.filter(r => r.status === currentReviewFilter);
+  const filtered = sheetReviews.filter(r => r.status === currentReviewFilter);
   document.getElementById('reviewList').innerHTML = filtered.length === 0
     ? '<div class="empty-state"><p>No reviews in this category.</p></div>'
     : filtered.map(r => `
@@ -1547,21 +1561,21 @@ function renderReviews() {
         <div class="review-header">
           <div>
             <div class="review-name">${r.name}</div>
-            <div class="review-stars">${'*'.repeat(r.stars)}${'*'.repeat(5-r.stars)}</div>
+            <div class="review-stars">${'★'.repeat(parseInt(r.rating))}${' ☆'.repeat(5-parseInt(r.rating))}</div>
           </div>
           <div class="review-date">${r.date}</div>
         </div>
-        <div class="review-text">"${r.text}"</div>
+        <div class="review-text">"${r.review}"</div>
         <div class="review-actions">
-          ${r.status === 'pending' ? `<button class="btn btn-sm" onclick="approveReview(${r.id})">v Approve</button><button class="btn btn-red btn-sm" onclick="rejectReview(${r.id})">X Reject</button>` : ''}
-          ${r.status === 'approved' ? `<span style="font-size:0.78rem;color:var(--accent);font-weight:800;">v Live on website</span>` : ''}
-          ${r.status === 'rejected' ? `<button class="btn btn-outline btn-sm" onclick="approveReview(${r.id})">Restore</button>` : ''}
+          ${r.status === 'pending' ? `<button class="btn btn-sm" onclick="approveReview(${r.row})">✓ Approve</button><button class="btn btn-red btn-sm" onclick="rejectReview(${r.row})">✗ Reject</button>` : ''}
+          ${r.status === 'approved' ? `<span style="font-size:0.78rem;color:var(--accent);font-weight:800;">✓ Live on website</span>` : ''}
+          ${r.status === 'denied' ? `<button class="btn btn-outline btn-sm" onclick="approveReview(${r.row})">Restore</button>` : ''}
         </div>
       </div>`).join('');
 }
 
 function updateReviewBadge() {
-  const pending = reviews.filter(r => r.status === 'pending').length;
+  const pending = sheetReviews.filter(r => r.status === 'pending').length;
   const badge = document.getElementById('pendingReviewBadge');
   if (badge) {
     badge.style.display = pending > 0 ? 'inline-block' : 'none';
@@ -1576,14 +1590,16 @@ function filterReviews(f, btn) {
   renderReviews();
 }
 
-function approveReview(id) {
-  const r = reviews.find(x => x.id === id);
-  if (r) { r.status = 'approved'; save('reviews', reviews); renderReviews(); updateReviewBadge(); logActivity(`Review approved: ${r.name}`); }
+function approveReview(row) {
+  fetch('https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?action=approveReview&row=' + row, { mode: 'no-cors' })
+    .then(() => loadSheetReviews())
+    .catch(() => loadSheetReviews());
 }
 
-function rejectReview(id) {
-  const r = reviews.find(x => x.id === id);
-  if (r) { r.status = 'rejected'; save('reviews', reviews); renderReviews(); updateReviewBadge(); logActivity(`Review rejected: ${r.name}`); }
+function rejectReview(row) {
+  fetch('https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?action=denyReview&row=' + row, { mode: 'no-cors' })
+    .then(() => loadSheetReviews())
+    .catch(() => loadSheetReviews());
 }
 
 // -- TEAM --

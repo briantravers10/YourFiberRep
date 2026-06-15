@@ -2119,7 +2119,7 @@
   let eligibleAddresses = [];
   let pricingData = [];
 
-  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz4wmnj-1J9Ol_E191qkiExwkp5pT66gAN1VL6b5YLX_1LAMnRUzJuwqFL4lcYO-s2O/exec';
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec';
 
   function loadSheetData() {
     // Load addresses
@@ -2278,7 +2278,7 @@
     };
 
     const params = new URLSearchParams(payload).toString();
-    const url = 'https://script.google.com/macros/s/AKfycbz4wmnj-1J9Ol_E191qkiExwkp5pT66gAN1VL6b5YLX_1LAMnRUzJuwqFL4lcYO-s2O/exec?' + params;
+    const url = 'https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?' + params;
     fetch(url, { method: 'GET', mode: 'no-cors' })
     .then(() => {
       document.getElementById('successModal').classList.add('active');
@@ -2330,7 +2330,7 @@
     if (bookBtn) { bookBtn.textContent = 'Sending...'; bookBtn.disabled = true; }
 
     const params = new URLSearchParams(payload).toString();
-    const url = 'https://script.google.com/macros/s/AKfycbz4wmnj-1J9Ol_E191qkiExwkp5pT66gAN1VL6b5YLX_1LAMnRUzJuwqFL4lcYO-s2O/exec?' + params;
+    const url = 'https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?' + params;
     fetch(url, { method: 'GET', mode: 'no-cors' })
     .then(() => {
       document.getElementById('successModal').classList.add('active');
@@ -2454,29 +2454,28 @@
   ];
   let allReviews = [...sampleReviews];
 
-  function renderReviews() {
-    const grid = document.getElementById('reviewsGrid');
-    if (!grid) return;
-    grid.innerHTML = allReviews.map(r => `
-      <div class="review-card">
-        <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
-        <div class="review-text">"${r.text}"</div>
-        <div class="review-author">${r.name}</div>
-        <div class="review-location">${r.location}</div>
-      </div>`).join('');
+  function loadAndRenderReviews() {
+    fetch('https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?action=getReviews')
+      .then(r => r.json())
+      .then(data => {
+        const approved = data.filter(r => r.status === 'approved');
+        const html = approved.map(r => `
+          <div class="review-card">
+            <div class="review-stars">${'★'.repeat(parseInt(r.rating))}${'☆'.repeat(5-parseInt(r.rating))}</div>
+            <div class="review-text">"${r.review}"</div>
+            <div class="review-author">${r.name}</div>
+            <div class="review-location">Local customer</div>
+          </div>`).join('');
+        const g1 = document.getElementById('reviewsGrid');
+        const g2 = document.getElementById('reviewsGrid2');
+        if (g1) g1.innerHTML = html || '<p>No reviews yet.</p>';
+        if (g2) g2.innerHTML = html || '<p>No reviews yet.</p>';
+      })
+      .catch(() => {});
   }
 
-  function renderReviews2() {
-    const grid = document.getElementById('reviewsGrid2');
-    if (!grid) return;
-    grid.innerHTML = allReviews.map(r => `
-      <div class="review-card">
-        <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
-        <div class="review-text">"${r.text}"</div>
-        <div class="review-author">${r.name}</div>
-        <div class="review-location">${r.location}</div>
-      </div>`).join('');
-  }
+  function renderReviews() { loadAndRenderReviews(); }
+  function renderReviews2() { loadAndRenderReviews(); }
 
   function openReviewModal() {
     document.getElementById('reviewModal').classList.add('active');
@@ -2510,11 +2509,23 @@
     if (!currentRating) { alert('Please select a star rating.'); return; }
     if (!name) { alert('Please enter your name.'); return; }
     if (!text || text.length < 10) { alert('Please write a short review (at least 10 characters).'); return; }
-    allReviews.unshift({ stars: currentRating, text, name, location: 'Local customer' });
-    renderReviews();
-    renderReviews2();
-    closeReviewModal();
-    document.getElementById('successModal').classList.add('active');
+    
+    const params = new URLSearchParams({
+      action: 'submitReview',
+      name: name,
+      rating: currentRating,
+      review: text
+    }).toString();
+    
+    fetch('https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?' + params, { method: 'GET', mode: 'no-cors' })
+      .then(() => {
+        closeReviewModal();
+        document.getElementById('successModal').classList.add('active');
+      })
+      .catch(() => {
+        closeReviewModal();
+        document.getElementById('successModal').classList.add('active');
+      });
   }
 
   // ── FAQ ──
