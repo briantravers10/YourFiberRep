@@ -2517,15 +2517,14 @@
       review: text
     }).toString();
     
-    fetch('https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?' + params, { method: 'GET', mode: 'no-cors' })
-      .then(() => {
-        closeReviewModal();
-        document.getElementById('successModal').classList.add('active');
-      })
-      .catch(() => {
-        closeReviewModal();
-        document.getElementById('successModal').classList.add('active');
-      });
+    // Use image trick to bypass CORS for fire-and-forget requests
+    const img = new Image();
+    img.src = 'https://script.google.com/macros/s/AKfycbwDu4UTU5Wwt4AfCdZolmhVfKUXyuP-MJjRQoOn4bzmYh7i2ouOGC75qqNsLYNTFFrU/exec?' + params;
+    img.onload = img.onerror = () => {};
+    setTimeout(() => {
+      closeReviewModal();
+      document.getElementById('successModal').classList.add('active');
+    }, 500);
   }
 
   // ── FAQ ──
